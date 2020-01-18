@@ -11,19 +11,35 @@ class Client {
       delimiter: this.delimiter
     });
   }
-  connect() {
+  init() {
     return this.ws.connect();
+  }
+  connect() {
+    return this.ws.request().send("connect", {
+      host: this.host,
+      port: this.port,
+      delimiter: this.delimiter
+    });
   }
   request(method, params) {
     return this.ws.request().send(method, params);
   }
-  subscribe(method, cb) {
-    this.ws.subscribe(method, (error, message) => {
-      cb(error, message);
-    });
+  startSubscribe(method, cb) {
+    this.cb = cb;
+    return this.ws
+      .request()
+      .send("start.subscribe", [method])
+      .then(() => {
+        this.ws.subscribe("subscribe", (error, message) => {
+          this.cb(error, message);
+        });
+      });
+  }
+  stopSubscribe() {
+    this.cb = undefined;
   }
   notify(method, params) {
-    return this.ws.request().notify(method, params);
+    return this.ws.request().send("notify", { method, params });
   }
 }
 

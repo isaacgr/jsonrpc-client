@@ -1,6 +1,6 @@
 import React from "react";
 
-const Form = props => {
+const Form = (props) => {
   return (
     <form onSubmit={props.onSubmit} className="form">
       <div className="form__section">
@@ -72,12 +72,14 @@ const Form = props => {
           className="form__input"
         />
       </div>
-      <input
-        className="form__submit"
-        disabled={props.state.submitting}
-        type="submit"
-        value="Submit"
-      />
+      <div className="form__section">
+        <input
+          className="form__submit"
+          disabled={props.state.submitting}
+          type="submit"
+          value="Submit"
+        />
+      </div>
     </form>
   );
 };
