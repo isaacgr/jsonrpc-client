@@ -73,7 +73,7 @@ wss.method("start.subscribe", ([method]) => {
       if (error) {
         reject(error);
       } else {
-        resolve(`Subscribed to ${method}`);
+        wss.notify("subscribe", [message]);
       }
     });
   });
