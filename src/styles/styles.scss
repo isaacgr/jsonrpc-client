@@ -10,6 +10,7 @@ $primary: #ecf0f1;
 $light: #bdc3c7;
 $text: #34495e;
 $text-secondary: #7f8c8d;
+$success: #27ae60;
 
 * {
   box-sizing: border-box;
@@ -71,7 +72,8 @@ body {
     letter-spacing: 0.5px;
     color: $text-secondary;
   }
-  &__submit {
+  &__submit,
+  &__button {
     padding: $s-size $m-size;
     border: 1px solid $text;
     cursor: pointer;
@@ -127,4 +129,8 @@ body {
   margin: 0 auto;
   margin-top: 1rem;
   text-align: center;
+}
+
+.connected {
+  background: $success;
 }

@@ -1,28 +1,24 @@
 const Jaysonic = require("jaysonic/lib/client-ws");
 
 class Client {
-  constructor(host, port, delimiter) {
-    this.host = host;
-    this.port = port;
-    this.delimiter = delimiter || "\r\n";
-    this.ws = new Jaysonic.wsclient({
-      host: this.host,
-      port: this.port,
-      delimiter: this.delimiter
-    });
+  constructor() {
+    this.ws = new Jaysonic.wsclient();
   }
   init() {
     return this.ws.connect();
   }
-  connect() {
+  connect(host, port, delimiter) {
     return this.ws.request().send("connect", {
-      host: this.host,
-      port: this.port,
-      delimiter: this.delimiter
+      host: host,
+      port: port,
+      delimiter: delimiter || "\n"
     });
   }
   request(method, params) {
     return this.ws.request().send(method, params);
+  }
+  notify(method, params) {
+    return this.ws.request().send("notify", { method, params });
   }
   startSubscribe(method, cb) {
     this.cb = cb;
@@ -37,9 +33,6 @@ class Client {
   }
   stopSubscribe() {
     this.cb = undefined;
-  }
-  notify(method, params) {
-    return this.ws.request().send("notify", { method, params });
   }
 }
 

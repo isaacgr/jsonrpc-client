@@ -19,11 +19,7 @@ class JsonRpcClient extends Component {
     };
   }
   componentDidMount() {
-    this.client = new Client(
-      this.state.host,
-      this.state.port,
-      this.state.delimiter
-    );
+    this.client = new Client();
     this.client
       .init()
       .then((result) => {
@@ -38,7 +34,8 @@ class JsonRpcClient extends Component {
       });
   }
   connect = () => {
-    return this.client.connect();
+    const { host, port, delimiter } = this.state;
+    return this.client.connect(host, port, delimiter);
   };
   request = () => {
     if (!this.state.connected) {
@@ -48,8 +45,7 @@ class JsonRpcClient extends Component {
     try {
       const params = JSON.parse(this.state.params);
       this.client
-        .request()
-        .send(method, params)
+        .request(method, params)
         .then((result) => {
           console.log(result);
         })
@@ -130,7 +126,7 @@ class JsonRpcClient extends Component {
   buttonPressed = () => {
     this.connect()
       .then((result) => {
-        console.log(`Connected. ${result}`);
+        console.log(`Connected. ${JSON.stringify(result)}`);
         this.setState((prevState) => ({
           ...prevState,
           submitting: false,
@@ -138,10 +134,10 @@ class JsonRpcClient extends Component {
         }));
       })
       .catch((response) => {
-        console.log(response);
         this.setState((prevState) => ({
           ...prevState,
           submitting: false,
+          connected: false,
           error: response.error.message
         }));
       });

@@ -22,7 +22,11 @@ const Form = (props) => {
         />
       </div>
       <div className="form__section">
-        <button type="button" onClick={props.buttonPressed}>
+        <button
+          className={`form__button ${props.state.connected ? "connected" : ""}`}
+          type="button"
+          onClick={props.buttonPressed}
+        >
           Connect
         </button>
       </div>
