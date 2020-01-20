@@ -3,6 +3,7 @@ import { Component } from "react";
 import Form from "./Form";
 import Client from "../functions/Client";
 import ErrorMessage from "./ErrorMessage";
+import Terminal from "./Terminal";
 
 class JsonRpcClient extends Component {
   constructor() {
@@ -15,7 +16,8 @@ class JsonRpcClient extends Component {
       connected: false,
       subscribing: false,
       method: "",
-      params: ""
+      params: "",
+      response: null
     };
   }
   componentDidMount() {
@@ -29,6 +31,7 @@ class JsonRpcClient extends Component {
         this.setState((prevState) => ({
           ...prevState,
           submitting: false,
+          response: response,
           error: response.error.message
         }));
       });
@@ -54,6 +57,8 @@ class JsonRpcClient extends Component {
           this.setState((prevState) => ({
             ...prevState,
             submitting: false,
+            response: response,
+
             error: response.error.message
           }));
         });
@@ -78,6 +83,8 @@ class JsonRpcClient extends Component {
           this.setState((prevState) => ({
             ...prevState,
             submitting: false,
+            response: response,
+
             error: response.error.message
           }));
         });
@@ -95,6 +102,8 @@ class JsonRpcClient extends Component {
         this.setState((prevState) => ({
           ...prevState,
           submitting: false,
+          response: response,
+
           error: response.error.message
         }));
       } else {
@@ -125,19 +134,24 @@ class JsonRpcClient extends Component {
   };
   buttonPressed = () => {
     this.connect()
-      .then((result) => {
+      .then((response) => {
         console.log(`Connected. ${JSON.stringify(result)}`);
         this.setState((prevState) => ({
           ...prevState,
           submitting: false,
+          response: response,
+
           connected: true
         }));
       })
       .catch((response) => {
+        console.log(response);
         this.setState((prevState) => ({
           ...prevState,
           submitting: false,
           connected: false,
+          response: response,
+
           error: response.error.message
         }));
       });
@@ -160,6 +174,7 @@ class JsonRpcClient extends Component {
           handleChange={this.handleChange}
           buttonPressed={this.buttonPressed}
         />
+        <Terminal text={this.state.response} />
         {this.state.error && !this.state.submitting ? (
           <ErrorMessage message={this.state.error} />
         ) : (

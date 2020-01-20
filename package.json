@@ -13,7 +13,6 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "jaysonic": "^1.3.3",
     "babel-cli": "^6.26.0",
     "babel-core": "^6.26.3",
     "babel-loader": "^7.1.5",
@@ -23,6 +22,7 @@
     "babel-preset-react": "^6.24.1",
     "css-loader": "^3.2.0",
     "express": "^4.17.1",
+    "jaysonic": "^1.3.3",
     "node-sass": "^4.13.0",
     "react": "^16.11.0",
     "react-dom": "^16.11.0",
