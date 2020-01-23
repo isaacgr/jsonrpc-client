@@ -20,20 +20,26 @@ const server = app.listen(port, () => {
     .then(() => {
       console.log(`WSS listening.`);
     })
-    .catch((error) => {
+    .catch(error => {
       console.log(`Unable to start server. ${error}`);
     });
 });
 
+const tcpDisconnected = () => {
+  console.log("TCP server disconnected");
+  wss.notify("tcp.disconnect", []);
+};
+
 wss.method("connect", ({ host, port, delimiter }) => {
   tcpClient = new Jaysonic.client.tcp({ host, port, delimiter });
+  tcpClient.serverDisconnected(tcpDisconnected);
   return new Promise((resolve, reject) => {
     tcpClient
       .connect()
-      .then((result) => {
+      .then(result => {
         resolve(result);
       })
-      .catch((error) => {
+      .catch(error => {
         reject(error);
       });
   });
@@ -44,10 +50,10 @@ wss.method("request", ({ method, params }) => {
     tcpClient
       .request()
       .send(method, params)
-      .then((result) => {
+      .then(result => {
         resolve(result);
       })
-      .catch((error) => {
+      .catch(error => {
         reject(error);
       });
   });
@@ -58,25 +64,27 @@ wss.method("notify", ({ method, params }) => {
     tcpClient
       .request()
       .notify(method, params)
-      .then((result) => {
+      .then(result => {
         resolve(result);
       })
-      .catch((error) => {
+      .catch(error => {
         reject(error);
       });
   });
 });
 
+const handleSubscriptions = (error, message) => {
+  console.log(error, message);
+  if (error) {
+    wss.notify("subscribe.error", [error]);
+  } else {
+    wss.notify("subscribe.success", [message]);
+  }
+};
+
 wss.method("start.subscribe", ([method]) => {
-  return new Promise((resolve, reject) => {
-    tcpClient.subscribe(method, (error, message) => {
-      if (error) {
-        reject(error);
-      } else {
-        wss.notify("subscribe", [message]);
-      }
-    });
-  });
+  tcpClient.subscribe(method, handleSubscriptions);
+  return `Subscribed to ${method}`;
 });
 
 module.exports = server;

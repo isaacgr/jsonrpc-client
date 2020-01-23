@@ -1,6 +1,6 @@
 import React from "react";
 
-const Form = (props) => {
+const Form = props => {
   return (
     <form onSubmit={props.onSubmit} className="form">
       <div className="form__section">
@@ -20,6 +20,16 @@ const Form = (props) => {
           onChange={props.handleChange}
           className="form__input"
         />
+        <label className="form__label">Delimiter</label>
+        <select
+          defaultValue="&#92;r&#92;n"
+          name="delimiter"
+          onChange={props.handleChange}
+          className="form__input"
+        >
+          <option value="&#92;r&#92;n">\r\n</option>
+          <option value="&#92;n">\n</option>
+        </select>
       </div>
       <div className="form__section">
         <button
@@ -40,9 +50,9 @@ const Form = (props) => {
           className="form__input"
         />
       </div>
-      <div className="form__section">
+      <div className="form__section textarea">
         <label className="form__label">Params</label>
-        <input
+        <textarea
           type="text"
           name="params"
           value={props.state.params}
@@ -55,6 +65,7 @@ const Form = (props) => {
         <input
           type="checkbox"
           name="request"
+          checked={props.state.request}
           value={props.state.request}
           onChange={props.handleChange}
           className="form__input"
@@ -63,6 +74,7 @@ const Form = (props) => {
         <input
           type="checkbox"
           name="notify"
+          checked={props.state.notify}
           value={props.state.notify}
           onChange={props.handleChange}
           className="form__input"
@@ -71,6 +83,7 @@ const Form = (props) => {
         <input
           type="checkbox"
           name="subscribe"
+          checked={props.state.subscribe}
           value={props.state.subscribe}
           onChange={props.handleChange}
           className="form__input"

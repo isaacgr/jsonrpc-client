@@ -11,12 +11,13 @@ class JsonRpcClient extends Component {
     this.state = {
       error: "",
       host: "",
+      delimiter: "\r\n",
       port: undefined,
       submitting: false,
       connected: false,
       subscribing: false,
       method: "",
-      params: "",
+      params: null,
       response: null
     };
   }
@@ -24,17 +25,26 @@ class JsonRpcClient extends Component {
     this.client = new Client();
     this.client
       .init()
-      .then((result) => {
-        console.log("WS client connected");
+      .then(result => {
+        console.log("WS client connected.");
       })
-      .catch((response) => {
-        this.setState((prevState) => ({
+      .catch(response => {
+        this.setState(prevState => ({
           ...prevState,
           submitting: false,
           response: response,
           error: response.error.message
         }));
       });
+    this.client.serverDisconnected(() => {
+      this.setState(prevState => ({
+        ...prevState,
+        submitting: false,
+        subscribing: false,
+        connected: false,
+        error: "TCP Server disconnected"
+      }));
+    });
   }
   connect = () => {
     const { host, port, delimiter } = this.state;
@@ -49,16 +59,17 @@ class JsonRpcClient extends Component {
       const params = JSON.parse(this.state.params);
       this.client
         .request(method, params)
-        .then((response) => {
-          this.setState((prevState) => ({
+        .then(response => {
+          this.setState(prevState => ({
             ...prevState,
             submitting: false,
-            response: response
+            response: response,
+            error: ""
           }));
         })
-        .catch((response) => {
+        .catch(response => {
           console.log(response);
-          this.setState((prevState) => ({
+          this.setState(prevState => ({
             ...prevState,
             submitting: false,
             response: response,
@@ -77,17 +88,17 @@ class JsonRpcClient extends Component {
     try {
       const params = JSON.parse(this.state.params);
       this.client
-        .notify()
-        .send(method, params)
-        .then((response) => {
-          this.setState((prevState) => ({
+        .notify(method, params)
+        .then(response => {
+          this.setState(prevState => ({
             ...prevState,
             submitting: false,
-            response: response
+            response: response,
+            error: ""
           }));
         })
-        .catch((response) => {
-          this.setState((prevState) => ({
+        .catch(response => {
+          this.setState(prevState => ({
             ...prevState,
             submitting: false,
             response: response,
@@ -103,52 +114,71 @@ class JsonRpcClient extends Component {
       throw new Error("Not connected");
     }
     const method = this.state.method;
-    this.client.subscribe(method, (error, message) => {
-      if (error) {
-        this.setState((prevState) => ({
+    this.client
+      .startSubscribe(method, (error, message) => {
+        if (error) {
+          this.setState(prevState => ({
+            ...prevState,
+            submitting: false,
+            error: response.error.message
+          }));
+        } else {
+          this.setState(prevState => ({
+            ...prevState,
+            submitting: false,
+            response: message,
+            subscribing: true,
+            error: ""
+          }));
+          console.log(message);
+        }
+      })
+      .catch(response => {
+        this.setState(prevState => ({
           ...prevState,
           submitting: false,
+          response: response,
           error: response.error.message
         }));
-      } else {
-        this.setState((prevState) => ({
-          ...prevState,
-          submitting: false,
-          response: message,
-          subscribing: true
-        }));
-        console.log(message);
-      }
-    });
+      });
   };
   stopSubscribe = () => {
-    this.setState((prevState) => ({
+    this.setState(prevState => ({
       ...prevState,
       submitting: false,
       subscribing: false
     }));
   };
-  onSubmit = (e) => {
+  onSubmit = e => {
     e.preventDefault();
     console.log("Form submitted");
-    this.request();
-    this.setState((prevState) => ({
+    if (this.state.request) {
+      this.request();
+    } else if (this.state.notify) {
+      this.notify();
+    } else if (this.state.subscribe) {
+      this.startSubscribe();
+    } else {
+      return;
+    }
+    this.setState(prevState => ({
       ...prevState,
       submitting: true
     }));
   };
   buttonPressed = () => {
     this.connect()
-      .then((response) => {
-        this.setState((prevState) => ({
+      .then(response => {
+        this.setState(prevState => ({
           ...prevState,
           connected: true,
           submitting: false,
-          response: response
+          response: response,
+          error: ""
         }));
       })
-      .catch((response) => {
-        this.setState((prevState) => ({
+      .catch(response => {
+        this.setState(prevState => ({
           ...prevState,
           submitting: false,
           connected: false,
@@ -157,14 +187,45 @@ class JsonRpcClient extends Component {
         }));
       });
   };
-  handleChange = (e) => {
+  handleChange = e => {
     const name = e.target.name;
     const value =
       e.target.type === "checkbox" ? e.target.checked : e.target.value;
-    this.setState((prevState) => ({
-      ...prevState,
-      [name]: value
-    }));
+    switch (name) {
+      case "request":
+        this.setState(prevState => ({
+          ...prevState,
+          [name]: value,
+          response: null,
+          subscribe: false,
+          notify: false
+        }));
+        break;
+      case "notify":
+        this.setState(prevState => ({
+          ...prevState,
+          [name]: value,
+          request: false,
+          response: null,
+          subscribe: false
+        }));
+        break;
+      case "subscribe":
+        this.setState(prevState => ({
+          ...prevState,
+          [name]: value,
+          request: false,
+          response: null,
+          notify: false
+        }));
+        break;
+      default:
+        this.setState(prevState => ({
+          ...prevState,
+          [name]: value
+        }));
+        break;
+    }
   };
   render() {
     return (
