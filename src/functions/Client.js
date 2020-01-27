@@ -2,16 +2,17 @@ const Jaysonic = require("jaysonic/lib/client-ws");
 
 class Client {
   constructor() {
-    this.ws = new Jaysonic.wsclient();
+    this.ws = new Jaysonic.wsclient({ timeout: 600 });
   }
   init() {
     return this.ws.connect();
   }
-  connect(host, port, delimiter) {
+  connect(host, port, delimiter, timeout) {
     return this.ws.request().send("connect", {
       host: host,
       port: port,
-      delimiter: delimiter || "\r\n"
+      delimiter: delimiter || "\r\n",
+      timeout
     });
   }
   serverDisconnected(cb) {
@@ -32,11 +33,15 @@ class Client {
       .send("start.subscribe", [method])
       .then(() => {
         this.ws.subscribe("subscribe.success", cb);
-        this.ws.subscribe("subscribe.error", cb);
       });
   }
-  stopSubscribe() {
-    this.cb = undefined;
+  stopSubscribe(method, cb) {
+    return this.ws
+      .request()
+      .send("stop.subscribe", [method])
+      .then(() => {
+        this.ws.subscribe("stop.subscribe.success", cb);
+      });
   }
 }
 

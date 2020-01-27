@@ -17,8 +17,8 @@ const server = app.listen(port, () => {
   });
   wss
     .listen()
-    .then(() => {
-      console.log(`WSS listening.`);
+    .then(conn => {
+      console.log(`WSS listening. ${JSON.stringify(conn)}`);
     })
     .catch(error => {
       console.log(`Unable to start server. ${error}`);
@@ -27,11 +27,11 @@ const server = app.listen(port, () => {
 
 const tcpDisconnected = () => {
   console.log("TCP server disconnected");
-  wss.notify("tcp.disconnect", []);
+  wss.notify([["tcp.disconnect", []]]);
 };
 
-wss.method("connect", ({ host, port, delimiter }) => {
-  tcpClient = new Jaysonic.client.tcp({ host, port, delimiter});
+wss.method("connect", ({ host, port, delimiter, timeout }) => {
+  tcpClient = new Jaysonic.client.tcp({ host, port, delimiter, timeout });
   tcpClient.serverDisconnected(tcpDisconnected);
   return new Promise((resolve, reject) => {
     tcpClient
@@ -73,18 +73,18 @@ wss.method("notify", ({ method, params }) => {
   });
 });
 
-const handleSubscriptions = (error, message) => {
-  console.log(error, message);
-  if (error) {
-    wss.notify("subscribe.error", [error]);
-  } else {
-    wss.notify("subscribe.success", [message]);
-  }
+const handleSubscriptions = message => {
+  wss.notify([["subscribe.success", [message]]]);
 };
 
 wss.method("start.subscribe", ([method]) => {
   tcpClient.subscribe(method, handleSubscriptions);
   return `Subscribed to ${method}`;
+});
+
+wss.method("stop.subscribe", ([method]) => {
+  tcpClient.unsubscribe(method, handleSubscriptions);
+  return `Unsubscribed from ${method}`;
 });
 
 module.exports = server;

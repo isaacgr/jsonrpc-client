@@ -18,7 +18,8 @@ class JsonRpcClient extends Component {
       subscribing: false,
       method: "",
       params: null,
-      response: null
+      response: null,
+      timeout: 30
     };
   }
   componentDidMount() {
@@ -47,8 +48,8 @@ class JsonRpcClient extends Component {
     });
   }
   connect = () => {
-    const { host, port, delimiter } = this.state;
-    return this.client.connect(host, port, delimiter);
+    const { host, port, delimiter, timeout } = this.state;
+    return this.client.connect(host, port, delimiter, timeout);
   };
   request = () => {
     if (!this.state.connected) {
@@ -109,30 +110,24 @@ class JsonRpcClient extends Component {
       throw e;
     }
   };
+  handleSubscriptionUpdates = ({ detail }) => {
+    this.setState(prevState => ({
+      ...prevState,
+      submitting: false,
+      response: detail,
+      subscribing: true,
+      error: ""
+    }));
+    console.log(detail);
+  };
   startSubscribe = () => {
     if (!this.state.connected) {
       throw new Error("Not connected");
     }
     const method = this.state.method;
     this.client
-      .startSubscribe(method, (error, message) => {
-        if (error) {
-          this.setState(prevState => ({
-            ...prevState,
-            submitting: false,
-            error: response.error.message
-          }));
-        } else {
-          this.setState(prevState => ({
-            ...prevState,
-            submitting: false,
-            response: message,
-            subscribing: true,
-            error: ""
-          }));
-          console.log(message);
-        }
-      })
+      .startSubscribe(method, this.handleSubscriptionUpdates)
+
       .catch(response => {
         this.setState(prevState => ({
           ...prevState,
@@ -143,11 +138,17 @@ class JsonRpcClient extends Component {
       });
   };
   stopSubscribe = () => {
-    this.setState(prevState => ({
-      ...prevState,
-      submitting: false,
-      subscribing: false
-    }));
+    const method = this.state.method;
+    this.client
+      .startSubscribe(method, this.handleSubscriptionUpdates)
+      .catch(response => {
+        this.setState(prevState => ({
+          ...prevState,
+          submitting: false,
+          response: response,
+          error: response.error.message
+        }));
+      });
   };
   onSubmit = e => {
     e.preventDefault();

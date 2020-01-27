@@ -30,6 +30,14 @@ const Form = props => {
           <option value="&#92;r&#92;n">\r\n</option>
           <option value="&#92;n">\n</option>
         </select>
+        <label className="form__label">Timeout</label>
+        <input
+          type="number"
+          name="timeout"
+          value={props.state.timeout}
+          onChange={props.handleChange}
+          className="form__input"
+        />
       </div>
       <div className="form__section">
         <button
