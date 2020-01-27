@@ -31,7 +31,7 @@ const tcpDisconnected = () => {
 };
 
 wss.method("connect", ({ host, port, delimiter }) => {
-  tcpClient = new Jaysonic.client.tcp({ host, port, delimiter });
+  tcpClient = new Jaysonic.client.tcp({ host, port, delimiter});
   tcpClient.serverDisconnected(tcpDisconnected);
   return new Promise((resolve, reject) => {
     tcpClient

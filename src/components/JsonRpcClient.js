@@ -152,6 +152,13 @@ class JsonRpcClient extends Component {
   onSubmit = e => {
     e.preventDefault();
     console.log("Form submitted");
+    if (!this.state.request && !this.state.notify && !this.state.subscribe) {
+      this.setState(prevState => ({
+        ...prevState,
+        error: "Please choose a request type"
+      }));
+      return;
+    }
     if (this.state.request) {
       this.request();
     } else if (this.state.notify) {
@@ -163,7 +170,8 @@ class JsonRpcClient extends Component {
     }
     this.setState(prevState => ({
       ...prevState,
-      submitting: true
+      submitting: true,
+      error: ""
     }));
   };
   buttonPressed = () => {
