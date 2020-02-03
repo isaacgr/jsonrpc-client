@@ -1,7 +1,9 @@
 const path = require("path");
 const express = require("express");
 const Jaysonic = require("jaysonic");
+const SubscriptionHandler = require("./functions/SubscriptionHandler");
 const wss = new Jaysonic.server.ws();
+const subscriptionHandler = new SubscriptionHandler(wss);
 let tcpClient;
 
 const publicPath = path.join(__dirname, "..", "public");
@@ -73,17 +75,13 @@ wss.method("notify", ({ method, params }) => {
   });
 });
 
-const handleSubscriptions = message => {
-  wss.notify([["subscribe.success", [message]]]);
-};
-
 wss.method("start.subscribe", ([method]) => {
-  tcpClient.subscribe(method, handleSubscriptions);
+  tcpClient.subscribe(method, subscriptionHandler.handleSubscriptions);
   return `Subscribed to ${method}`;
 });
 
 wss.method("stop.subscribe", ([method]) => {
-  tcpClient.unsubscribe(method, handleSubscriptions);
+  tcpClient.unsubscribe(method, subscriptionHandler.handleSubscriptions);
   return `Unsubscribed from ${method}`;
 });
 
