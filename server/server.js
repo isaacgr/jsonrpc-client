@@ -84,21 +84,14 @@ wss.method("notify", ({ method, params, clientId }) => {
   });
 });
 
-const handleSubscriptionUpdates = (message) => {
-  wss.notify([["subscribe.success", [message]]]);
-};
-
 wss.method("start.subscribe", ([method, clientId]) => {
-  clientHandler
-    .tcpClient(clientId)
-    .subscribe(method, handleSubscriptionUpdates);
+  const subs = clientHandler.subscriptionHandler(wss, method);
+  clientHandler.tcpClient(clientId).subscribe(method, subs);
   return `Subscribed to "${method}"`;
 });
 
 wss.method("stop.subscribe", ([method, clientId]) => {
-  clientHandler
-    .tcpClient(clientId)
-    .unsubscribe(method, handleSubscriptionUpdates);
+  clientHandler.tcpClient(clientId).unsubscribeAll(method);
   return `Unsubscribed from ${method}`;
 });
 

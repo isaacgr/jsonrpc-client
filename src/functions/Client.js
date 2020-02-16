@@ -41,9 +41,9 @@ class Client {
     return this.ws
       .request()
       .send("start.subscribe", [method, this.clientId])
-      .then((res) => {
-        this.ws.subscribe("subscribe.success", cb);
-        return res;
+      .then(() => {
+        this.ws.subscribe(method, cb);
+        return;
       });
   }
   stopSubscribe(method, cb) {
@@ -51,7 +51,8 @@ class Client {
       .request()
       .send("stop.subscribe", [method, this.clientId])
       .then(() => {
-        this.ws.subscribe("stop.subscribe.success", cb);
+        this.ws.unsubscribeAll(method);
+        return;
       });
   }
 }

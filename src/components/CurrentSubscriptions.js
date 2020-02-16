@@ -1,22 +1,29 @@
 import React from "react";
 
-const CurrentSubscriptions = props => {
+const CurrentSubscriptions = (props) => {
   return (
-    <div>
-      <form onSubmit={props.onSubmit}>
+    <form className="form">
+      <div className="form__section">
         <p className="form__label">Currently Subscribed Methods</p>
         <select
           className="form__input"
-          name="subscriptions"
+          name="unsubscribe"
           onChange={props.handleChange}
-          multiple
+          defaultValue={props.subscriptions[0]}
         >
-          {props.subscriptions.map(sub => {
-            return <option value={sub}>{sub}</option>;
+          {props.subscriptions.map((sub, idx) => {
+            return (
+              <option key={sub} value={sub}>
+                {sub}
+              </option>
+            );
           })}
         </select>
-      </form>
-    </div>
+        <button role="button" onClick={props.stopSubscribe}>
+          Stop Subscribing
+        </button>
+      </div>
+    </form>
   );
 };
 
