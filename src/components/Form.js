@@ -1,6 +1,6 @@
 import React from "react";
 
-const Form = (props) => {
+const Form = props => {
   return (
     <form onSubmit={props.onSubmit} className="form">
       <div className="form__section">
@@ -63,6 +63,8 @@ const Form = (props) => {
         <textarea
           type="text"
           name="params"
+          rows="10"
+          cols="100"
           value={props.state.params}
           onChange={props.handleChange}
           className="form__input"
