@@ -28,11 +28,11 @@ class JsonRpcClient extends Component {
     this.client = new Client();
     this.client
       .init()
-      .then((result) => {
+      .then(result => {
         console.log("WS client connected.");
       })
-      .catch((response) => {
-        this.setState((prevState) => ({
+      .catch(response => {
+        this.setState(prevState => ({
           ...prevState,
           submitting: false,
           response: response,
@@ -40,7 +40,7 @@ class JsonRpcClient extends Component {
         }));
       });
     this.client.serverDisconnected(() => {
-      this.setState((prevState) => ({
+      this.setState(prevState => ({
         ...prevState,
         submitting: false,
         subscribing: false,
@@ -62,16 +62,16 @@ class JsonRpcClient extends Component {
       const params = JSON.parse(this.state.params);
       this.client
         .request(method, params)
-        .then((response) => {
-          this.setState((prevState) => ({
+        .then(response => {
+          this.setState(prevState => ({
             ...prevState,
             submitting: false,
             response: response,
             error: ""
           }));
         })
-        .catch((response) => {
-          this.setState((prevState) => ({
+        .catch(response => {
+          this.setState(prevState => ({
             ...prevState,
             submitting: false,
             response: response,
@@ -91,16 +91,16 @@ class JsonRpcClient extends Component {
       const params = JSON.parse(this.state.params);
       this.client
         .notify(method, params)
-        .then((response) => {
-          this.setState((prevState) => ({
+        .then(response => {
+          this.setState(prevState => ({
             ...prevState,
             submitting: false,
             response: `Notification sent: ${response.result[0]}`,
             error: ""
           }));
         })
-        .catch((response) => {
-          this.setState((prevState) => ({
+        .catch(response => {
+          this.setState(prevState => ({
             ...prevState,
             submitting: false,
             response: response,
@@ -112,7 +112,7 @@ class JsonRpcClient extends Component {
     }
   };
   handleSubscriptionUpdates = ({ detail }) => {
-    this.setState((prevState) => ({
+    this.setState(prevState => ({
       ...prevState,
       submitting: false,
       response: detail,
@@ -132,14 +132,14 @@ class JsonRpcClient extends Component {
       .startSubscribe(method, this.handleSubscriptionUpdates)
       .then(() => {
         this.setState(
-          (prevState) => ({
+          prevState => ({
             ...prevState,
             submitting: false,
             subscriptions: [...prevState.subscriptions, method]
           }),
           () => {
             if (this.state.subscriptions.length === 1) {
-              this.setState((prevState) => ({
+              this.setState(prevState => ({
                 ...prevState,
                 unsubscribe: prevState.subscriptions[0]
               }));
@@ -147,8 +147,8 @@ class JsonRpcClient extends Component {
           }
         );
       })
-      .catch((response) => {
-        this.setState((prevState) => ({
+      .catch(response => {
+        this.setState(prevState => ({
           ...prevState,
           submitting: false,
           response: response,
@@ -156,24 +156,24 @@ class JsonRpcClient extends Component {
         }));
       });
   };
-  stopSubscribe = (e) => {
+  stopSubscribe = e => {
     e.preventDefault();
     const method = this.state.unsubscribe;
     this.client
       .stopSubscribe(method, this.handleSubscriptionUpdates)
-      .then((res) => {
+      .then(res => {
         const newSubs = this.state.subscriptions.filter(
-          (value) => value !== method
+          value => value !== method
         );
         this.setState(
-          (prevState) => ({
+          prevState => ({
             ...prevState,
             submitting: false,
             subscriptions: newSubs
           }),
           () => {
             if (this.state.subscriptions.length === 1) {
-              this.setState((prevState) => ({
+              this.setState(prevState => ({
                 ...prevState,
                 unsubscribe: prevState.subscriptions[0]
               }));
@@ -181,8 +181,8 @@ class JsonRpcClient extends Component {
           }
         );
       })
-      .catch((response) => {
-        this.setState((prevState) => ({
+      .catch(response => {
+        this.setState(prevState => ({
           ...prevState,
           submitting: false,
           response: response,
@@ -190,11 +190,11 @@ class JsonRpcClient extends Component {
         }));
       });
   };
-  onSubmit = (e) => {
+  onSubmit = e => {
     e.preventDefault();
     console.log("Form submitted");
     if (!this.state.request && !this.state.notify && !this.state.subscribe) {
-      this.setState((prevState) => ({
+      this.setState(prevState => ({
         ...prevState,
         error: "Please choose a request type"
       }));
@@ -210,13 +210,13 @@ class JsonRpcClient extends Component {
       } else {
         return;
       }
-      this.setState((prevState) => ({
+      this.setState(prevState => ({
         ...prevState,
         submitting: true,
         error: ""
       }));
     } catch (e) {
-      this.setState((prevState) => ({
+      this.setState(prevState => ({
         ...prevState,
         submitting: false,
         error: e.message
@@ -225,8 +225,8 @@ class JsonRpcClient extends Component {
   };
   buttonPressed = () => {
     this.connect()
-      .then((response) => {
-        this.setState((prevState) => ({
+      .then(response => {
+        this.setState(prevState => ({
           ...prevState,
           connected: true,
           submitting: false,
@@ -234,8 +234,8 @@ class JsonRpcClient extends Component {
           error: ""
         }));
       })
-      .catch((response) => {
-        this.setState((prevState) => ({
+      .catch(response => {
+        this.setState(prevState => ({
           ...prevState,
           submitting: false,
           connected: false,
@@ -244,13 +244,13 @@ class JsonRpcClient extends Component {
         }));
       });
   };
-  handleChange = (e) => {
+  handleChange = e => {
     const name = e.target.name;
     const value =
       e.target.type === "checkbox" ? e.target.checked : e.target.value;
     switch (name) {
       case "request":
-        this.setState((prevState) => ({
+        this.setState(prevState => ({
           ...prevState,
           [name]: value,
           response: null,
@@ -259,7 +259,7 @@ class JsonRpcClient extends Component {
         }));
         break;
       case "notify":
-        this.setState((prevState) => ({
+        this.setState(prevState => ({
           ...prevState,
           [name]: value,
           request: false,
@@ -268,7 +268,7 @@ class JsonRpcClient extends Component {
         }));
         break;
       case "subscribe":
-        this.setState((prevState) => ({
+        this.setState(prevState => ({
           ...prevState,
           [name]: value,
           request: false,
@@ -277,13 +277,13 @@ class JsonRpcClient extends Component {
         }));
         break;
       case "params":
-        this.setState((prevState) => ({
+        this.setState(prevState => ({
           ...prevState,
           [name]: value === "" ? null : value
         }));
         break;
       default:
-        this.setState((prevState) => ({
+        this.setState(prevState => ({
           ...prevState,
           [name]: value
         }));

@@ -19,15 +19,15 @@ const server = app.listen(port, () => {
   });
   wss
     .listen()
-    .then((conn) => {
+    .then(conn => {
       console.log(`WSS listening. ${JSON.stringify(conn)}`);
     })
-    .catch((error) => {
+    .catch(error => {
       console.log(`Unable to start server. ${error}`);
     });
 });
 
-const tcpDisconnected = (clientId) => {
+const tcpDisconnected = clientId => {
   console.log("TCP server disconnected");
   // delete ws client reference from handler class
   clientHandler.removeClient(clientId);
@@ -40,15 +40,15 @@ wss.method("connect", ({ host, port, delimiter, timeout, clientId }) => {
   // subscribe the tcp server to serverDisconnected
   clientHandler
     .tcpClient(clientId)
-    .serverDisconnected((clientId) => tcpDisconnected(clientId));
+    .serverDisconnected(clientId => tcpDisconnected(clientId));
   return new Promise((resolve, reject) => {
     clientHandler
       .tcpClient(clientId)
       .connect()
-      .then((result) => {
+      .then(result => {
         resolve(result);
       })
-      .catch((error) => {
+      .catch(error => {
         reject(error);
       });
   });
@@ -60,10 +60,10 @@ wss.method("request", ({ method, params, clientId }) => {
       .tcpClient(clientId)
       .request()
       .send(method, params)
-      .then((result) => {
+      .then(result => {
         resolve(result);
       })
-      .catch((error) => {
+      .catch(error => {
         reject(error);
       });
   });
@@ -75,10 +75,10 @@ wss.method("notify", ({ method, params, clientId }) => {
       .tcpClient(clientId)
       .request()
       .notify(method, params)
-      .then((result) => {
+      .then(result => {
         resolve(result);
       })
-      .catch((error) => {
+      .catch(error => {
         reject(error);
       });
   });

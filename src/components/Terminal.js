@@ -1,7 +1,7 @@
 import React from "react";
 import ReactJson from "react-json-view";
 
-const TerminalWrapper = (props) => {
+const TerminalWrapper = props => {
   let text;
   if (props.text) {
     if (props.text.error) {
