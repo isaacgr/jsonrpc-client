@@ -1,8 +1,9 @@
 const Jaysonic = require("jaysonic/lib/client-ws");
-
+const uuidv4 = require("uuid/v4");
 class Client {
   constructor() {
     this.ws = new Jaysonic.wsclient({ timeout: 600 });
+    this.clientId = uuidv4();
   }
   init() {
     return this.ws.connect();
@@ -12,7 +13,8 @@ class Client {
       host: host,
       port: port,
       delimiter: delimiter || "\r\n",
-      timeout
+      timeout: timeout,
+      clientId: this.clientId
     });
   }
   serverDisconnected(cb) {
@@ -22,23 +24,32 @@ class Client {
     });
   }
   request(method, params) {
-    return this.ws.request().send("request", { method, params: params || [] });
+    return this.ws.request().send("request", {
+      method: method,
+      params: params,
+      clientId: this.clientId
+    });
   }
   notify(method, params) {
-    return this.ws.request().send("notify", { method, params: params || [] });
+    return this.ws.request().send("notify", {
+      method: method,
+      params: params,
+      clientId: this.clientId
+    });
   }
   startSubscribe(method, cb) {
     return this.ws
       .request()
-      .send("start.subscribe", [method])
-      .then(() => {
+      .send("start.subscribe", [method, this.clientId])
+      .then((res) => {
         this.ws.subscribe("subscribe.success", cb);
+        return res;
       });
   }
   stopSubscribe(method, cb) {
     return this.ws
       .request()
-      .send("stop.subscribe", [method])
+      .send("stop.subscribe", [method, this.clientId])
       .then(() => {
         this.ws.subscribe("stop.subscribe.success", cb);
       });

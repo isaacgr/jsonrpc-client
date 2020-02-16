@@ -1,6 +1,6 @@
 import React from "react";
 
-const Form = props => {
+const Form = (props) => {
   return (
     <form onSubmit={props.onSubmit} className="form">
       <div className="form__section">
@@ -22,13 +22,13 @@ const Form = props => {
         />
         <label className="form__label">Delimiter</label>
         <select
-          defaultValue="&#92;r&#92;n"
+          defaultValue={"\r\n"}
           name="delimiter"
           onChange={props.handleChange}
           className="form__input"
         >
-          <option value="&#92;r&#92;n">\r\n</option>
-          <option value="&#92;n">\n</option>
+          <option value={"\r\n"}>\r\n</option>
+          <option value={"\n"}>\n</option>
         </select>
         <label className="form__label">Timeout</label>
         <input
