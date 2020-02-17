@@ -1,30 +1,37 @@
-import React from "react";
+import React from 'react';
+import PropTypes from 'prop-types';
 
-const CurrentSubscriptions = (props) => {
-  return (
-    <form className="form">
-      <div className="form__section">
-        <p className="form__label">Currently Subscribed Methods</p>
-        <select
-          className="form__input"
-          name="unsubscribe"
-          onChange={props.handleChange}
-          defaultValue={props.subscriptions[0]}
-        >
-          {props.subscriptions.map((sub, idx) => {
-            return (
-              <option key={sub} value={sub}>
-                {sub}
-              </option>
-            );
-          })}
-        </select>
-        <button role="button" onClick={props.stopSubscribe}>
-          Stop Subscribing
-        </button>
-      </div>
-    </form>
-  );
+const CurrentSubscriptions = ({
+  handleChange,
+  subscriptions,
+  stopSubscribe
+}) => (
+  <form className="form">
+    <div className="form__section">
+      <p className="form__label">Currently Subscribed Methods</p>
+      <select
+        className="form__input"
+        name="unsubscribe"
+        onChange={handleChange}
+        defaultValue={subscriptions[0]}
+      >
+        {subscriptions.map((sub) => (
+          <option key={sub} value={sub}>
+            {sub}
+          </option>
+        ))}
+      </select>
+      <button type="button" onClick={stopSubscribe}>
+        Stop Subscribing
+      </button>
+    </div>
+  </form>
+);
+
+CurrentSubscriptions.propTypes = {
+  handleChange: PropTypes.func.isRequired,
+  subscriptions: PropTypes.arrayOf(PropTypes.string).isRequired,
+  stopSubscribe: PropTypes.func.isRequired
 };
 
 export default CurrentSubscriptions;

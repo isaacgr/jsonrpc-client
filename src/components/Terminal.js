@@ -1,31 +1,32 @@
-import React from "react";
-import ReactJson from "react-json-view";
+import React from 'react';
+import ReactJson from 'react-json-view';
+import PropTypes from 'prop-types';
 
-const TerminalWrapper = props => {
-  let text;
-  if (props.text) {
-    if (props.text.error) {
-      console.log(props.text.error.message);
-      text = JSON.parse(props.text.error.message);
-      if (typeof text === "string") {
-        text = { internalMessage: text };
+const TerminalWrapper = ({ text }) => {
+  let output;
+  if (text) {
+    if (text.error) {
+      console.log(text.error.message);
+      const errorText = JSON.parse(text.error.message);
+      if (typeof errorText === 'string') {
+        output = { internalMessage: errorText };
       }
-    } else if (props.text.result) {
-      if (props.text.result[0].result) {
-        text = props.text.result[0];
+    } else if (text.result) {
+      if (text.result[0].result) {
+        output = text.result[0];
       } else {
-        text = props.text.result[0];
+        output = text.result[0];
       }
-    } else if (props.text.params) {
-      text = props.text.params[0];
+    } else if (text.params) {
+      output = text.params[0];
     } else {
-      text = { internalMessage: props.text };
+      output = { internalMessage: text };
     }
   }
   return (
     <div className="form__section textarea terminal">
       <ReactJson
-        src={text}
+        src={output}
         displayDataTypes={false}
         theme="solarized"
         name={false}
@@ -39,6 +40,10 @@ const TerminalWrapper = props => {
       /> */}
     </div>
   );
+};
+
+TerminalWrapper.propTypes = {
+  text: PropTypes.object.isRequired
 };
 
 export default TerminalWrapper;
