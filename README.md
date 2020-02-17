@@ -14,6 +14,7 @@ A web client to interface to a JSON-RPC server over a TCP connection.
 
 ```
 git clone https://github.com/isaacgr/jsonrpc-client.git
+cd jsonrpc-client/
 ```
 
 2. Install the required packages and start the application
