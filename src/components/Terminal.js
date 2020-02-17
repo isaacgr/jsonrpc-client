@@ -10,6 +10,8 @@ const TerminalWrapper = ({ text }) => {
       const errorText = JSON.parse(text.error.message);
       if (typeof errorText === 'string') {
         output = { internalMessage: errorText };
+      } else {
+        output = errorText;
       }
     } else if (text.result) {
       if (text.result[0].result) {
