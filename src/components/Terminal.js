@@ -5,7 +5,11 @@ const TerminalWrapper = props => {
   let text;
   if (props.text) {
     if (props.text.error) {
+      console.log(props.text.error.message);
       text = JSON.parse(props.text.error.message);
+      if (typeof text === "string") {
+        text = { internalMessage: text };
+      }
     } else if (props.text.result) {
       if (props.text.result[0].result) {
         text = props.text.result[0];
