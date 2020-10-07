@@ -1,23 +1,23 @@
-import React from 'react';
-import Form from './Form';
-import Client from '../functions/Client';
-import ErrorMessage from './ErrorMessage';
-import Terminal from './Terminal';
-import CurrentSubscriptions from './CurrentSubscriptions';
+import React from "react";
+import Form from "./Form";
+import Client from "../functions/Client";
+import ErrorMessage from "./ErrorMessage";
+import Terminal from "./Terminal";
+import CurrentSubscriptions from "./CurrentSubscriptions";
 
 class JsonRpcClient extends React.Component {
   constructor() {
     super();
     this.state = {
-      error: '',
-      host: '',
-      delimiter: '\r\n',
+      error: "",
+      host: "",
+      delimiter: "\r\n",
       port: undefined,
       submitting: false,
       connected: false,
       subscribing: false,
       subscriptions: [],
-      method: '',
+      method: "",
       params: null,
       response: null,
       timeout: 30
@@ -29,7 +29,7 @@ class JsonRpcClient extends React.Component {
     this.client
       .init()
       .then(() => {
-        console.log('WS client connected.');
+        console.log("WS client connected.");
       })
       .catch((response) => {
         this.setState((prevState) => ({
@@ -45,19 +45,19 @@ class JsonRpcClient extends React.Component {
         submitting: false,
         subscribing: false,
         connected: false,
-        error: 'Server disconnected'
+        error: "Server disconnected"
       }));
     });
   }
 
   onSubmit = (e) => {
     e.preventDefault();
-    console.log('Form submitted');
+    console.log("Form submitted");
     const { request, notify, subscribe } = this.state;
     if (!request && !notify && !subscribe) {
       this.setState((prevState) => ({
         ...prevState,
-        error: 'Please choose a request type'
+        error: "Please choose a request type"
       }));
       return;
     }
@@ -74,7 +74,7 @@ class JsonRpcClient extends React.Component {
       this.setState((prevState) => ({
         ...prevState,
         submitting: true,
-        error: ''
+        error: ""
       }));
     } catch (e) {
       this.setState((prevState) => ({
@@ -86,16 +86,14 @@ class JsonRpcClient extends React.Component {
   };
 
   connect = () => {
-    const {
-      host, port, delimiter, timeout
-    } = this.state;
+    const { host, port, delimiter, timeout } = this.state;
     return this.client.connect(host, port, delimiter, timeout);
   };
 
   request = () => {
     const { connected, params } = this.state;
     if (!connected) {
-      throw new Error('Not connected');
+      throw new Error("Not connected");
     }
     const { method } = this.state;
     const parameters = JSON.parse(params);
@@ -106,7 +104,7 @@ class JsonRpcClient extends React.Component {
           ...prevState,
           submitting: false,
           response,
-          error: ''
+          error: ""
         }));
       })
       .catch((response) => {
@@ -122,7 +120,7 @@ class JsonRpcClient extends React.Component {
   notify = () => {
     const { connected, params } = this.state;
     if (!connected) {
-      throw new Error('Not connected');
+      throw new Error("Not connected");
     }
     const { method } = this.state;
     const parameters = JSON.parse(params);
@@ -133,7 +131,7 @@ class JsonRpcClient extends React.Component {
           ...prevState,
           submitting: false,
           response: `Notification sent: ${response.result[0]}`,
-          error: ''
+          error: ""
         }));
       })
       .catch((response) => {
@@ -152,14 +150,14 @@ class JsonRpcClient extends React.Component {
       submitting: false,
       response: detail,
       subscribing: true,
-      error: ''
+      error: ""
     }));
   };
 
   startSubscribe = () => {
     const { connected, subscriptions } = this.state;
     if (!connected) {
-      throw new Error('Not connected');
+      throw new Error("Not connected");
     }
     const { method } = this.state;
     if (subscriptions.includes(method)) {
@@ -230,6 +228,16 @@ class JsonRpcClient extends React.Component {
       });
   };
 
+  formatJson = () => {
+    var ugly = this.state.params.replace(/'/g, '"');
+    var obj = JSON.parse(ugly);
+    var pretty = JSON.stringify(obj, undefined, 2);
+    this.setState((prevState) => ({
+      ...prevState,
+      params: pretty
+    }));
+  };
+
   buttonPressed = () => {
     this.connect()
       .then((response) => {
@@ -238,7 +246,7 @@ class JsonRpcClient extends React.Component {
           connected: true,
           submitting: false,
           response,
-          error: ''
+          error: ""
         }));
       })
       .catch((response) => {
@@ -254,9 +262,10 @@ class JsonRpcClient extends React.Component {
 
   handleChange = (e) => {
     const { name } = e.target;
-    const value = e.target.type === 'checkbox' ? e.target.checked : e.target.value;
+    const value =
+      e.target.type === "checkbox" ? e.target.checked : e.target.value;
     switch (name) {
-      case 'request':
+      case "request":
         this.setState((prevState) => ({
           ...prevState,
           [name]: value,
@@ -265,7 +274,7 @@ class JsonRpcClient extends React.Component {
           notify: false
         }));
         break;
-      case 'notify':
+      case "notify":
         this.setState((prevState) => ({
           ...prevState,
           [name]: value,
@@ -274,7 +283,7 @@ class JsonRpcClient extends React.Component {
           subscribe: false
         }));
         break;
-      case 'subscribe':
+      case "subscribe":
         this.setState((prevState) => ({
           ...prevState,
           [name]: value,
@@ -283,10 +292,10 @@ class JsonRpcClient extends React.Component {
           notify: false
         }));
         break;
-      case 'params':
+      case "params":
         this.setState((prevState) => ({
           ...prevState,
-          [name]: value === '' ? null : value
+          [name]: value === "" ? null : value
         }));
         break;
       default:
@@ -299,9 +308,7 @@ class JsonRpcClient extends React.Component {
   };
 
   render() {
-    const {
-      subscriptions, error, submitting, response
-    } = this.state;
+    const { subscriptions, error, submitting, response } = this.state;
     return (
       <div className="container">
         <Form
@@ -309,6 +316,7 @@ class JsonRpcClient extends React.Component {
           onSubmit={this.onSubmit}
           handleChange={this.handleChange}
           buttonPressed={this.buttonPressed}
+          formatJson={this.formatJson}
         />
         {subscriptions.length > 0 ? (
           <CurrentSubscriptions
@@ -317,9 +325,9 @@ class JsonRpcClient extends React.Component {
             handleChange={this.handleChange}
           />
         ) : (
-          ''
+          ""
         )}
-        {error && !submitting ? <ErrorMessage message={error} /> : ''}
+        {error && !submitting ? <ErrorMessage message={error} /> : ""}
         <Terminal text={response} />
       </div>
     );
