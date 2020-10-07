@@ -1,9 +1,7 @@
-import React from 'react';
-import PropTypes from 'prop-types';
+import React from "react";
+import PropTypes from "prop-types";
 
-const Form = ({
-  state, onSubmit, handleChange, buttonPressed
-}) => (
+const Form = ({ state, onSubmit, handleChange, buttonPressed, formatJson }) => (
   <form onSubmit={onSubmit} className="form">
     <div className="form__section">
       <label className="form__label">Host</label>
@@ -24,13 +22,13 @@ const Form = ({
       />
       <label className="form__label">Delimiter</label>
       <select
-        defaultValue={'\r\n'}
+        defaultValue={"\r\n"}
         name="delimiter"
         onChange={handleChange}
         className="form__input"
       >
-        <option value={'\r\n'}>\r\n</option>
-        <option value={'\n'}>\n</option>
+        <option value={"\r\n"}>\r\n</option>
+        <option value={"\n"}>\n</option>
       </select>
       <label className="form__label">Timeout</label>
       <input
@@ -43,7 +41,7 @@ const Form = ({
     </div>
     <div className="form__section">
       <button
-        className={`form__button ${state.connected ? 'connected' : ''}`}
+        className={`form__button ${state.connected ? "connected" : ""}`}
         type="button"
         onClick={buttonPressed}
       >
@@ -71,6 +69,14 @@ const Form = ({
         onChange={handleChange}
         className="form__input"
       />
+      <button
+        type="button"
+        value={state.params}
+        className="form__button"
+        onClick={formatJson}
+      >
+        Prettify
+      </button>
     </div>
     <div className="form__section">
       <label className="form__label">Request</label>
