@@ -229,7 +229,7 @@ class JsonRpcClient extends React.Component {
   };
 
   formatJson = () => {
-    var ugly = this.state.params.replace(/'/g, '"').replace(/\bNone\b(?!.)/g, null);
+    var ugly = this.state.params.replace(/'/g, '"').replace(/\bNone\b(?!")/g, null);
     var obj = JSON.parse(ugly);
     var pretty = JSON.stringify(obj, undefined, 2);
     this.setState((prevState) => ({
