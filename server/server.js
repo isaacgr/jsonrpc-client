@@ -1,12 +1,12 @@
-const path = require('path');
-const express = require('express');
-const Jaysonic = require('jaysonic');
-const ClientHandler = require('./functions/ClientHandler');
+const path = require("path");
+const express = require("express");
+const Jaysonic = require("jaysonic");
+const ClientHandler = require("./functions/ClientHandler");
 
 const wss = new Jaysonic.server.ws();
 const clientHandler = new ClientHandler();
 
-const publicPath = path.join(__dirname, '..', 'public');
+const publicPath = path.join(__dirname, "..", "public");
 const port = process.env.PORT || 3000;
 const app = express();
 
@@ -14,8 +14,8 @@ app.use(express.static(publicPath));
 
 const server = app.listen(port, () => {
   console.log(`Server started on ${port}`);
-  app.get('/jsonrpc-client/*', (request, response) => {
-    response.sendFile(path.join(publicPath, 'index.html'));
+  app.get("/", (request, response) => {
+    response.sendFile(path.join(publicPath, "index.html"));
   });
   wss
     .listen()
@@ -28,15 +28,13 @@ const server = app.listen(port, () => {
 });
 
 const tcpDisconnected = (clientId) => {
-  console.log('TCP server disconnected');
+  console.log("TCP server disconnected");
   // delete ws client reference from handler class
   clientHandler.removeClient(clientId);
-  wss.notify([['tcp.disconnect']]);
+  wss.notify([["tcp.disconnect"]]);
 };
 
-wss.method('connect', ({
-  host, port, delimiter, timeout, clientId,
-}) => {
+wss.method("connect", ({ host, port, delimiter, timeout, clientId }) => {
   // create a new tcp client for this client id
   clientHandler.newClient(host, port, delimiter, timeout, clientId);
   // subscribe the tcp server to serverDisconnected
@@ -56,39 +54,47 @@ wss.method('connect', ({
   });
 });
 
-wss.method('request', ({ method, params, clientId }) => new Promise((resolve, reject) => {
-  clientHandler
-    .tcpClient(clientId)
-    .request()
-    .send(method, params)
-    .then((result) => {
-      resolve(result);
+wss.method(
+  "request",
+  ({ method, params, clientId }) =>
+    new Promise((resolve, reject) => {
+      clientHandler
+        .tcpClient(clientId)
+        .request()
+        .send(method, params)
+        .then((result) => {
+          resolve(result);
+        })
+        .catch((error) => {
+          reject(error);
+        });
     })
-    .catch((error) => {
-      reject(error);
-    });
-}));
+);
 
-wss.method('notify', ({ method, params, clientId }) => new Promise((resolve, reject) => {
-  clientHandler
-    .tcpClient(clientId)
-    .request()
-    .notify(method, params)
-    .then((result) => {
-      resolve(result);
+wss.method(
+  "notify",
+  ({ method, params, clientId }) =>
+    new Promise((resolve, reject) => {
+      clientHandler
+        .tcpClient(clientId)
+        .request()
+        .notify(method, params)
+        .then((result) => {
+          resolve(result);
+        })
+        .catch((error) => {
+          reject(error);
+        });
     })
-    .catch((error) => {
-      reject(error);
-    });
-}));
+);
 
-wss.method('start.subscribe', ([method, clientId]) => {
+wss.method("start.subscribe", ([method, clientId]) => {
   const subs = clientHandler.subscriptionHandler(wss, method);
   clientHandler.tcpClient(clientId).subscribe(method, subs);
   return `Subscribed to "${method}"`;
 });
 
-wss.method('stop.subscribe', ([method, clientId]) => {
+wss.method("stop.subscribe", ([method, clientId]) => {
   clientHandler.tcpClient(clientId).unsubscribeAll(method);
   return `Unsubscribed from ${method}`;
 });

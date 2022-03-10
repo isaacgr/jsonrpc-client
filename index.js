@@ -1,9 +1,10 @@
-import React from 'react';
-import ReactDOM from 'react-dom';
-import JsonRpcClient from './src/components/JsonRpcClient';
+import React from "react";
+import ReactDOM from "react-dom";
+import JsonRpcClient from "./src/components/JsonRpcClient";
+import "@fontsource/roboto/300.css";
+import "@fontsource/roboto/400.css";
+import "@fontsource/roboto/500.css";
+import "@fontsource/roboto/700.css";
+import "./src/styles/styles.scss";
 
-import './src/styles/styles.scss';
-
-const jsx = <JsonRpcClient />;
-
-ReactDOM.render(jsx, document.getElementById('root'));
+ReactDOM.render(<JsonRpcClient />, document.getElementById("root"));
