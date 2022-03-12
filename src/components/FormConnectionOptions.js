@@ -16,10 +16,17 @@ const ConnectionOptions = ({
   buttonPressed
 }) => {
   return (
-    <div className="form__section">
-      <div>
-        <TextField id="host" label="Host" variant="outlined" value={host} />
+    <div className="content-block ">
+      <div className="content-block content-block--flex">
         <TextField
+          size="small"
+          id="host"
+          label="Host"
+          variant="outlined"
+          value={host}
+        />
+        <TextField
+          size="small"
           id="port"
           type="number"
           label="Port"
@@ -29,6 +36,7 @@ const ConnectionOptions = ({
         <FormControl>
           <InputLabel id="delimiter-label">Delimiter</InputLabel>
           <Select
+            size="small"
             labelId="delimiter-label"
             id="delimiter"
             value={delimiter}
@@ -40,6 +48,7 @@ const ConnectionOptions = ({
           </Select>
         </FormControl>
         <TextField
+          size="small"
           id="timeout"
           type="number"
           label="Connection Timeout"
@@ -47,8 +56,9 @@ const ConnectionOptions = ({
           value={connectionTimeout}
         />
       </div>
-      <div className="form__section">
+      <div className="content-block">
         <Button
+          classname="button"
           variant="outlined"
           color={connected ? "success" : "primary"}
           onClick={buttonPressed}

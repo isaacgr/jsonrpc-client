@@ -2,9 +2,11 @@ import React from "react";
 import PropTypes from "prop-types";
 import ConnectionOptions from "./FormConnectionOptions";
 import DataEntry from "./FormDataEntry";
+import FormSelectors from "./FormSelectors";
+import Button from "@mui/material/Button";
 
 const Form = ({ state, onSubmit, handleChange, buttonPressed, formatJson }) => (
-  <form onSubmit={onSubmit} className="form">
+  <form onSubmit={onSubmit} className="content-block form">
     <ConnectionOptions
       host={state.host}
       port={state.port}
@@ -20,43 +22,15 @@ const Form = ({ state, onSubmit, handleChange, buttonPressed, formatJson }) => (
       formatJson={formatJson}
       handleChange={handleChange}
     />
-    <div className="form__section">
-      <label className="form__label">Request</label>
-      <input
-        type="checkbox"
-        name="request"
-        checked={state.request}
-        value={state.request}
-        onChange={handleChange}
-        className="form__input"
-      />
-      <label className="form__label">Notify</label>
-      <input
-        type="checkbox"
-        name="notify"
-        checked={state.notify}
-        value={state.notify}
-        onChange={handleChange}
-        className="form__input"
-      />
-      <label className="form__label">Subscribe</label>
-      <input
-        type="checkbox"
-        name="subscribe"
-        checked={state.subscribe}
-        value={state.subscribe}
-        onChange={handleChange}
-        className="form__input"
-      />
-    </div>
-    <div className="form__section">
-      <input
-        className="form__submit"
-        disabled={state.submitting}
-        type="submit"
-        value="Submit"
-      />
-    </div>
+    <FormSelectors
+      request={state.request}
+      notify={state.notify}
+      subscribe={state.subscribe}
+      handleChange={handleChange}
+    />
+    <Button className="button" disabled={state.submitting} variant="contained">
+      Submit
+    </Button>
   </form>
 );
 

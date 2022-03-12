@@ -5,27 +5,33 @@ import Button from "@mui/material/Button";
 const DataEntry = ({ method, params, handleChange, formatJson }) => {
   return (
     <div>
-      <div className="form__section">
-        <TextField label="Method" value={method} onChange={handleChange} />
-      </div>
-      <div className="form__section textarea">
+      <div className="content-block">
         <TextField
-          style={{ width: "100%" }}
+          size="small"
+          label="Method"
+          value={method}
+          onChange={handleChange}
+        />
+      </div>
+      <div className="content-block">
+        <TextField
+          style={{ width: "80%" }}
           rows={10}
           multiline
           label="Params"
-          value={params}
+          value={params || ""}
           onChange={handleChange}
         />
-        <Button
-          type="button"
-          variant="contained"
-          value={params}
-          onClick={formatJson}
-        >
-          Prettify
-        </Button>
       </div>
+      <Button
+        className="button"
+        color="secondary"
+        variant="outlined"
+        value={params}
+        onClick={formatJson}
+      >
+        Prettify
+      </Button>
     </div>
   );
 };
