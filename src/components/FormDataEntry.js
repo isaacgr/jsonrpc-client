@@ -2,7 +2,7 @@ import React from "react";
 import TextField from "@mui/material/TextField";
 import Button from "@mui/material/Button";
 
-const DataEntry = ({ method, params, handleChange, formatJson }) => {
+const DataEntry = ({ method, params, setState, formatJson }) => {
   return (
     <div>
       <div className="content-block">
@@ -10,7 +10,12 @@ const DataEntry = ({ method, params, handleChange, formatJson }) => {
           size="small"
           label="Method"
           value={method}
-          onChange={handleChange}
+          onChange={(e) =>
+            setState((prevState) => ({
+              ...prevState,
+              method: e.target.value
+            }))
+          }
         />
       </div>
       <div className="content-block">
@@ -20,7 +25,12 @@ const DataEntry = ({ method, params, handleChange, formatJson }) => {
           multiline
           label="Params"
           value={params || ""}
-          onChange={handleChange}
+          onChange={(e) =>
+            setState((prevState) => ({
+              ...prevState,
+              params: e.target.value
+            }))
+          }
         />
       </div>
       <Button

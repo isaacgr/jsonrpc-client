@@ -12,8 +12,8 @@ const ConnectionOptions = ({
   delimiter,
   connectionTimeout,
   connected,
-  handleChange,
-  buttonPressed
+  setState,
+  connect
 }) => {
   return (
     <div className="content-block ">
@@ -24,6 +24,12 @@ const ConnectionOptions = ({
           label="Host"
           variant="outlined"
           value={host}
+          onChange={(e) =>
+            setState((prevState) => ({
+              ...prevState,
+              host: e.target.value
+            }))
+          }
         />
         <TextField
           size="small"
@@ -32,6 +38,12 @@ const ConnectionOptions = ({
           label="Port"
           variant="outlined"
           value={port}
+          onChange={(e) =>
+            setState((prevState) => ({
+              ...prevState,
+              port: e.target.value
+            }))
+          }
         />
         <FormControl>
           <InputLabel id="delimiter-label">Delimiter</InputLabel>
@@ -41,7 +53,12 @@ const ConnectionOptions = ({
             id="delimiter"
             value={delimiter}
             label="Delimiter"
-            onChange={handleChange}
+            onChange={(e) =>
+              setState((prevState) => ({
+                ...prevState,
+                delimiter: e.target.value
+              }))
+            }
           >
             <MenuItem value={"\r\n"}>\r\n</MenuItem>
             <MenuItem value={"\n"}>\n</MenuItem>
@@ -54,14 +71,20 @@ const ConnectionOptions = ({
           label="Connection Timeout"
           variant="outlined"
           value={connectionTimeout}
+          onChange={(e) =>
+            setState((prevState) => ({
+              ...prevState,
+              timeout: e.target.value
+            }))
+          }
         />
       </div>
       <div className="content-block">
         <Button
-          classname="button"
+          className="button"
           variant="outlined"
           color={connected ? "success" : "primary"}
-          onClick={buttonPressed}
+          onClick={connect}
         >
           Connect
         </Button>
