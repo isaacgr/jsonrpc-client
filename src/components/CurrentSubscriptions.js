@@ -1,35 +1,48 @@
-import React from 'react';
-import PropTypes from 'prop-types';
+import React, { useState } from "react";
+import TextField from "@mui/material/TextField";
+import Autocomplete from "@mui/material/Autocomplete";
+import Button from "@mui/material/Button";
+import PropTypes from "prop-types";
 
-const CurrentSubscriptions = ({
-  handleChange,
-  subscriptions,
-  stopSubscribe
-}) => (
-  <form className="form">
-    <div className="form__section">
-      <p className="form__label">Currently Subscribed Methods</p>
-      <select
-        className="form__input"
-        name="unsubscribe"
-        onChange={handleChange}
-        defaultValue={subscriptions[0]}
+const CurrentSubscriptions = ({ subscriptions, stopSubscribe }) => {
+  const [currentSubscription, setCurrentSubscription] = useState(
+    subscriptions[0]
+  );
+  return (
+    <div className="content-block content-block--flex">
+      <Autocomplete
+        disablePortal
+        id="unsubscribe"
+        autoSelect
+        autoHighlight
+        size="small"
+        disableClearable
+        value={currentSubscription}
+        options={subscriptions}
+        sx={{ width: 300 }}
+        onChange={(e, newValue) => setCurrentSubscription(newValue)}
+        renderInput={(params) => (
+          <TextField
+            {...params}
+            label="Subscribed Methods"
+            variant="outlined"
+          />
+        )}
+      />
+      <Button
+        variant="outlined"
+        onClick={() => {
+          stopSubscribe(currentSubscription);
+          setCurrentSubscription(subscriptions[0]);
+        }}
       >
-        {subscriptions.map((sub) => (
-          <option key={sub} value={sub}>
-            {sub}
-          </option>
-        ))}
-      </select>
-      <button type="button" onClick={stopSubscribe}>
         Stop Subscribing
-      </button>
+      </Button>
     </div>
-  </form>
-);
+  );
+};
 
 CurrentSubscriptions.propTypes = {
-  handleChange: PropTypes.func.isRequired,
   subscriptions: PropTypes.arrayOf(PropTypes.string).isRequired,
   stopSubscribe: PropTypes.func.isRequired
 };

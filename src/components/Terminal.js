@@ -28,7 +28,7 @@ const TerminalWrapper = ({ text }) => {
         rows="50"
         cols="100"
         disabled
-        value={props.text ? JSON.stringify(text, null, 2) : ""}
+        value={output ? JSON.stringify(output, null, 2) : ""}
       /> */}
     </div>
   );

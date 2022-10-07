@@ -38,7 +38,7 @@ const ConnectionOptions = ({
           type="number"
           label="Port"
           variant="outlined"
-          value={port}
+          // value={port}
           onChange={(e) =>
             setState((prevState) => ({
               ...prevState,
@@ -63,6 +63,7 @@ const ConnectionOptions = ({
           >
             <MenuItem value={"\r\n"}>\r\n</MenuItem>
             <MenuItem value={"\n"}>\n</MenuItem>
+            <MenuItem value={"\r"}>\r</MenuItem>
           </Select>
         </FormControl>
         <TextField

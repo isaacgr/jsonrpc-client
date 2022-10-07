@@ -53,11 +53,6 @@ const JsonRpcClient = () => {
     }
     try {
       sendRequest(state.queryType);
-      setState((prevState) => ({
-        ...prevState,
-        submitting: true,
-        error: ""
-      }));
     } catch (e) {
       setState((prevState) => ({
         ...prevState,
@@ -84,28 +79,17 @@ const JsonRpcClient = () => {
     try {
       await client.stopSubscribe(method, handleSubscriptionUpdates);
       const newSubs = subscriptions.filter((value) => value !== method);
-      this.setState(
-        (prevState) => ({
-          ...prevState,
-          submitting: false,
-          subscriptions: newSubs
-        }),
-        () => {
-          const { subscriptions } = state;
-          if (subscriptions.length === 1) {
-            setState((prevState) => ({
-              ...prevState,
-              unsubscribe: prevState.subscriptions[0]
-            }));
-          }
-        }
-      );
-    } catch (error) {
       setState((prevState) => ({
         ...prevState,
         submitting: false,
-        response,
-        error: response.error.message
+        subscriptions: newSubs
+      }));
+    } catch (e) {
+      console.log(e);
+      setState((prevState) => ({
+        ...prevState,
+        submitting: false,
+        error: e.error.message
       }));
     }
   };
@@ -122,12 +106,17 @@ const JsonRpcClient = () => {
 
   const sendRequest = async (queryType) => {
     const { connected, params } = state;
-    if (!connected) {
-      throw new Error("Not connected");
-    }
     const parameters = JSON.parse(params);
     let response;
+    setState((prevState) => ({
+      ...prevState,
+      submitting: true,
+      error: ""
+    }));
     try {
+      if (!connected) {
+        throw new Error("Not connected");
+      }
       const { method } = state;
       switch (queryType) {
         case "request":
@@ -149,41 +138,37 @@ const JsonRpcClient = () => {
           }));
           break;
         case "subscribe":
-          const { connected, subscriptions } = state;
-          if (!connected) {
-            throw new Error("Not connected");
-          }
+          const { subscriptions } = state;
           if (subscriptions.includes(method)) {
-            return;
+            throw new Error("Method already subscribed.");
           }
           await client.startSubscribe(method, handleSubscriptionUpdates);
-          setState(
-            (prevState) => ({
-              ...prevState,
-              submitting: false,
-              subscriptions: [...prevState.subscriptions, method]
-            }),
-            () => {
-              const { subscriptions } = this.state;
-              if (subscriptions.length === 1) {
-                setState((prevState) => ({
-                  ...prevState,
-                  unsubscribe: prevState.subscriptions[0]
-                }));
-              }
-            }
-          );
+          setState((prevState) => ({
+            ...prevState,
+            submitting: false,
+            subscriptions: [...prevState.subscriptions, method]
+          }));
           break;
         default:
           break;
       }
     } catch (e) {
-      setState((prevState) => ({
-        ...prevState,
-        submitting: false,
-        response: JSON.parse(e.error.message),
-        error: JSON.parse(e.error.message).error.message
-      }));
+      console.log(e);
+      if (e instanceof Error) {
+        setState((prevState) => ({
+          ...prevState,
+          submitting: false,
+          response: null,
+          error: e.message
+        }));
+      } else {
+        setState((prevState) => ({
+          ...prevState,
+          submitting: false,
+          response: JSON.parse(e.error.message),
+          error: JSON.parse(e.error.message).error.message
+        }));
+      }
     }
   };
 
