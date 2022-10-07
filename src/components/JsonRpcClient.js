@@ -25,7 +25,20 @@ const JsonRpcClient = () => {
 
   const connect = async () => {
     const { host, port, delimiter, timeout } = state;
-    const response = await client.connect(host, port, delimiter, timeout);
+    try {
+      await client.connect(host, port, delimiter, timeout);
+      setState((prevState) => ({
+        ...prevState,
+        connected: true,
+        error: ""
+      }));
+    } catch (e) {
+      setState((prevState) => ({
+        ...prevState,
+        error: e.error.message,
+        connected: false
+      }));
+    }
   };
 
   const onSubmit = (e) => {
@@ -112,10 +125,10 @@ const JsonRpcClient = () => {
     if (!connected) {
       throw new Error("Not connected");
     }
-    const { method } = state;
     const parameters = JSON.parse(params);
     let response;
     try {
+      const { method } = state;
       switch (queryType) {
         case "request":
           response = await client.request(method, parameters);
@@ -125,20 +138,21 @@ const JsonRpcClient = () => {
             response,
             error: ""
           }));
+          break;
         case "notify":
           response = await client.notify(method, parameters);
           setState((prevState) => ({
             ...prevState,
             submitting: false,
-            response: `Notification sent: ${response.result[0]}`,
+            response: `Notification sent: ${response.result}`,
             error: ""
           }));
+          break;
         case "subscribe":
           const { connected, subscriptions } = state;
           if (!connected) {
             throw new Error("Not connected");
           }
-          const { method } = state;
           if (subscriptions.includes(method)) {
             return;
           }
@@ -159,15 +173,16 @@ const JsonRpcClient = () => {
               }
             }
           );
+          break;
         default:
           break;
       }
-    } catch (error) {
+    } catch (e) {
       setState((prevState) => ({
         ...prevState,
         submitting: false,
-        response,
-        error: JSON.parse(error.message)
+        response: JSON.parse(e.error.message),
+        error: JSON.parse(e.error.message).error.message
       }));
     }
   };

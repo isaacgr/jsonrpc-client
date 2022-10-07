@@ -3,7 +3,7 @@ import PropTypes from "prop-types";
 import ConnectionOptions from "./FormConnectionOptions";
 import DataEntry from "./FormDataEntry";
 import FormSelectors from "./FormSelectors";
-import Button from "@mui/material/Button";
+import Submit from "./Submit";
 
 const Form = ({ state, setState, onSubmit, connect, formatJson }) => (
   <form onSubmit={onSubmit} className="content-block form">
@@ -23,9 +23,11 @@ const Form = ({ state, setState, onSubmit, connect, formatJson }) => (
       setState={setState}
     />
     <FormSelectors queryType={state.queryType} setState={setState} />
-    <Button className="button" disabled={state.submitting} variant="contained">
-      Submit
-    </Button>
+    <Submit
+      result={state.response}
+      error={state.error}
+      submitting={state.submitting}
+    />
   </form>
 );
 

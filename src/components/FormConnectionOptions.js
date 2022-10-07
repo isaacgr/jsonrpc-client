@@ -19,6 +19,7 @@ const ConnectionOptions = ({
     <div className="content-block ">
       <div className="content-block content-block--flex">
         <TextField
+          autoComplete="on"
           size="small"
           id="host"
           label="Host"
@@ -82,7 +83,7 @@ const ConnectionOptions = ({
       <div className="content-block">
         <Button
           className="button"
-          variant="outlined"
+          variant={connected ? "contained" : "outlined"}
           color={connected ? "success" : "primary"}
           onClick={connect}
         >

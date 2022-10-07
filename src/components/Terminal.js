@@ -6,21 +6,11 @@ const TerminalWrapper = ({ text }) => {
   let output;
   if (text) {
     if (text.error) {
-      console.log(text.error.message);
-      const errorText = JSON.parse(text.error.message);
-      if (typeof errorText === "string") {
-        output = { internalMessage: errorText };
-      } else {
-        output = errorText;
-      }
+      output = text;
     } else if (text.result) {
-      if (text.result[0].result) {
-        output = text.result[0];
-      } else {
-        output = text.result[0];
-      }
+      output = text.result;
     } else if (text.params) {
-      output = text.params[0];
+      output = text.params;
     } else {
       output = { internalMessage: text };
     }

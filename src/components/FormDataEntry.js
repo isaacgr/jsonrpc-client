@@ -1,6 +1,7 @@
 import React from "react";
 import TextField from "@mui/material/TextField";
 import Button from "@mui/material/Button";
+import TextareaAutosize from "@mui/material/TextareaAutosize";
 
 const DataEntry = ({ method, params, setState, formatJson }) => {
   return (
@@ -19,7 +20,19 @@ const DataEntry = ({ method, params, setState, formatJson }) => {
         />
       </div>
       <div className="content-block">
-        <TextField
+        <TextareaAutosize
+          placeholder="Params"
+          minRows={10}
+          style={{ width: "50%" }}
+          value={params || ""}
+          onChange={(e) =>
+            setState((prevState) => ({
+              ...prevState,
+              params: e.target.value
+            }))
+          }
+        />
+        {/* <TextField
           style={{ width: "80%" }}
           rows={10}
           multiline
@@ -31,7 +44,7 @@ const DataEntry = ({ method, params, setState, formatJson }) => {
               params: e.target.value
             }))
           }
-        />
+        /> */}
       </div>
       <Button
         className="button"
