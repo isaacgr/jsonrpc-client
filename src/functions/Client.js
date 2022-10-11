@@ -21,11 +21,22 @@ class Client {
     });
   }
 
-  serverDisconnected(cb) {
+  tcpServerDisconnected(cb) {
     this.ws.subscribe("tcp.disconnect", () => {
       console.log("TCP server disconnected");
       cb();
     });
+  }
+
+  ping(eb) {
+    const _this = this;
+    setInterval(async () => {
+      try {
+        await _this.ws.request().send("ping", [_this.clientId]);
+      } catch (e) {
+        eb(e);
+      }
+    }, 5000);
   }
 
   request(method, params) {

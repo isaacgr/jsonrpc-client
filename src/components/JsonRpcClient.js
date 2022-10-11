@@ -12,6 +12,7 @@ const JsonRpcClient = () => {
     host: "",
     delimiter: "\r\n",
     port: null,
+    connectedHost: "",
     submitting: false,
     connected: false,
     subscribing: false,
@@ -25,19 +26,34 @@ const JsonRpcClient = () => {
 
   const connect = async () => {
     const { host, port, delimiter, timeout } = state;
+    setState((prevState) => ({
+      ...prevState,
+      connected: false,
+      error: ""
+    }));
     try {
-      await client.connect(host, port, delimiter, timeout);
+      const { result } = await client.connect(host, port, delimiter, timeout);
       setState((prevState) => ({
         ...prevState,
         connected: true,
-        error: ""
+        connectedHost: `${result.host}:${result.port}`
       }));
     } catch (e) {
-      setState((prevState) => ({
-        ...prevState,
-        error: e.error.message,
-        connected: false
-      }));
+      if (e instanceof Error) {
+        setState((prevState) => ({
+          ...prevState,
+          submitting: false,
+          response: null,
+          error: e.message
+        }));
+      } else {
+        setState((prevState) => ({
+          ...prevState,
+          error: e.error.message,
+          connected: false,
+          connectedHost: ""
+        }));
+      }
     }
   };
 
@@ -166,7 +182,7 @@ const JsonRpcClient = () => {
           ...prevState,
           submitting: false,
           response: JSON.parse(e.error.message),
-          error: JSON.parse(e.error.message).error.message
+          error: JSON.parse(e.error.message).error?.message
         }));
       }
     }
@@ -186,13 +202,22 @@ const JsonRpcClient = () => {
           error: response.error.message
         }));
       });
-    client.serverDisconnected(() => {
+    client.ping(() => {
       setState((prevState) => ({
         ...prevState,
         submitting: false,
         subscribing: false,
         connected: false,
-        error: "Server disconnected"
+        error: "WS Server disconnected"
+      }));
+    });
+    client.tcpServerDisconnected(() => {
+      setState((prevState) => ({
+        ...prevState,
+        submitting: false,
+        subscribing: false,
+        connected: false,
+        error: "TCP Server disconnected"
       }));
     });
   }, []);

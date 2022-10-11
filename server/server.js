@@ -40,7 +40,7 @@ wss.method("connect", ({ host, port, delimiter, timeout, clientId }) => {
   // subscribe the tcp server to serverDisconnected
   clientHandler
     .tcpClient(clientId)
-    .serverDisconnected((clientId) => tcpDisconnected(clientId));
+    .serverDisconnected(() => tcpDisconnected(clientId));
   return new Promise((resolve, reject) => {
     clientHandler
       .tcpClient(clientId)
@@ -52,6 +52,25 @@ wss.method("connect", ({ host, port, delimiter, timeout, clientId }) => {
         reject(error);
       });
   });
+});
+
+wss.method("ping", async ([clientId]) => {
+  try {
+    if (clientHandler.wsClientToTimeout[clientId]) {
+      clearTimeout(clientHandler.wsClientToTimeout[clientId]);
+      clientHandler.wsClientToTimeout[clientId] = setTimeout(() => {
+        clientHandler.wsClientToTcp[clientId].end();
+      }, 20000);
+    } else {
+      clientHandler.wsClientToTimeout[clientId] = setTimeout(() => {
+        clientHandler.wsClientToTcp[clientId].end();
+      }, 20000);
+    }
+    return "pong";
+  } catch (e) {
+    console.log(e);
+    return e;
+  }
 });
 
 wss.method(

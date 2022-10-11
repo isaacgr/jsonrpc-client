@@ -10,6 +10,7 @@ const Form = ({ state, setState, onSubmit, connect, formatJson }) => (
     <ConnectionOptions
       host={state.host}
       port={state.port}
+      connectedHost={state.connectedHost}
       delimiter={state.delimiter}
       connectionTimeout={state.timeout}
       connected={state.connected}
