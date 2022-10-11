@@ -9,7 +9,7 @@
     "start": "node server/server.js",
     "build": "webpack --mode=production",
     "build-dev": "webpack --watch",
-    "dev-server": "nodemon server/server.js",
+    "dev-server": "nodemon server/server.js -L",
     "start-dev": "concurrently 'npm run build-dev' 'npm run dev-server'"
   },
   "author": "",

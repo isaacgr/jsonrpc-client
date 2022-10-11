@@ -22,7 +22,10 @@ class Client {
   }
 
   tcpServerDisconnected(cb) {
-    this.ws.subscribe("tcp.disconnect", () => {
+    this.ws.subscribe("tcp.disconnect", ({ detail }) => {
+      if (detail.params[0] !== this.clientId) {
+        return;
+      }
       console.log("TCP server disconnected");
       cb();
     });

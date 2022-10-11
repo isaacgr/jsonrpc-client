@@ -5,7 +5,7 @@ class ClientHandler {
   constructor() {
     this.wsClientToTcp = {};
     this.subscriptions = {};
-    this.wsClientToTimeout = {};
+    this.wsClientToTcpTimeout = {};
   }
 
   newClient(host, port, delimiter, timeout, clientId) {

@@ -31,7 +31,7 @@ const tcpDisconnected = (clientId) => {
   console.log("TCP server disconnected");
   // delete ws client reference from handler class
   clientHandler.removeClient(clientId);
-  wss.notify([["tcp.disconnect"]]);
+  wss.notify([["tcp.disconnect", [clientId]]]);
 };
 
 wss.method("connect", ({ host, port, delimiter, timeout, clientId }) => {
@@ -56,14 +56,18 @@ wss.method("connect", ({ host, port, delimiter, timeout, clientId }) => {
 
 wss.method("ping", async ([clientId]) => {
   try {
-    if (clientHandler.wsClientToTimeout[clientId]) {
-      clearTimeout(clientHandler.wsClientToTimeout[clientId]);
-      clientHandler.wsClientToTimeout[clientId] = setTimeout(() => {
-        clientHandler.wsClientToTcp[clientId].end();
+    if (clientHandler.wsClientToTcpTimeout[clientId]) {
+      clearTimeout(clientHandler.wsClientToTcpTimeout[clientId]);
+      clientHandler.wsClientToTcpTimeout[clientId] = setTimeout(() => {
+        if (clientHandler.wsClientToTcp[clientId]) {
+          clientHandler.wsClientToTcp[clientId].end();
+        }
       }, 20000);
     } else {
-      clientHandler.wsClientToTimeout[clientId] = setTimeout(() => {
-        clientHandler.wsClientToTcp[clientId].end();
+      clientHandler.wsClientToTcpTimeout[clientId] = setTimeout(() => {
+        if (clientHandler.wsClientToTcp[clientId]) {
+          clientHandler.wsClientToTcp[clientId].end();
+        }
       }, 20000);
     }
     return "pong";
