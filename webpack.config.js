@@ -1,9 +1,19 @@
 // entry -> output
 const path = require("path");
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
+const HtmlWebpackPlugin = require("html-webpack-plugin");
 
 module.exports = {
-  plugins: [new MiniCssExtractPlugin()],
+  plugins: [
+    new MiniCssExtractPlugin({
+      filename: "main.[contenthash].css"
+    }),
+    new HtmlWebpackPlugin({
+      title: "JSON-RPC Client",
+      template: "template.html",
+      favicon: "images/favicon.ico"
+    })
+  ],
   mode: "development",
   watchOptions: {
     ignored: /node_modules/,
@@ -12,7 +22,8 @@ module.exports = {
   entry: "./src/index.js",
   output: {
     path: path.join(__dirname, "public"),
-    filename: "bundle.js"
+    filename: "bundle.[contenthash].js",
+    clean: true
   },
   module: {
     rules: [
@@ -29,20 +40,11 @@ module.exports = {
       },
       {
         test: /\.s[ac]ss$/i,
-        use: [
-          // MiniCssExtractPlugin.loader,
-          "style-loader",
-          "css-loader",
-          "sass-loader"
-        ]
+        use: ["style-loader", "css-loader", "sass-loader"]
       },
       {
         test: /\.css$/i,
-        use: [
-          // MiniCssExtractPlugin.loader,
-          "style-loader",
-          "css-loader"
-        ]
+        use: ["style-loader", "css-loader"]
       },
       {
         test: /\.(jpe?g|gif|png|svg)$/i,
