@@ -4,6 +4,7 @@ import Client from "../functions/Client";
 import ErrorMessage from "./ErrorMessage";
 import Terminal from "./Terminal";
 import CurrentSubscriptions from "./CurrentSubscriptions";
+import Alert from "@mui/material/Alert";
 
 const JsonRpcClient = () => {
   const [client] = useState(new Client());
@@ -110,14 +111,15 @@ const JsonRpcClient = () => {
     }
   };
 
-  const formatJson = () => {
-    var ugly = state.params.replace(/'/g, '"').replace(/\bNone\b(?!")/g, null);
+  const formatJson = (value) => {
+    var ugly = value.replace(/'/g, '"').replace(/\bNone\b(?!")/g, null);
     var obj = JSON.parse(ugly);
     var pretty = JSON.stringify(obj, undefined, 2);
     setState((prevState) => ({
       ...prevState,
       params: pretty
     }));
+    return pretty;
   };
 
   const sendRequest = async (queryType) => {
@@ -237,11 +239,18 @@ const JsonRpcClient = () => {
           stopSubscribe={stopSubscribe}
         />
       )}
-      {state.error && !state.submitting ? (
-        <ErrorMessage message={state.error} />
-      ) : (
-        ""
-      )}
+      <div className="content-block">
+        {state.error && !state.submitting ? (
+          <Alert
+            style={{ width: "50%", margin: "0 auto 1rem auto" }}
+            severity="error"
+          >
+            {state.error}
+          </Alert>
+        ) : (
+          ""
+        )}
+      </div>
       <Terminal text={state.response} />
     </div>
   );

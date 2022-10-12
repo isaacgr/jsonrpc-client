@@ -1,9 +1,9 @@
 import React from "react";
-import ReactJson from "react-json-view";
 import PropTypes from "prop-types";
+import Editor from "@monaco-editor/react";
 
 const TerminalWrapper = ({ text }) => {
-  let output;
+  let output = null;
   if (text) {
     if (text.error) {
       output = text;
@@ -15,21 +15,20 @@ const TerminalWrapper = ({ text }) => {
       output = { internalMessage: text };
     }
   }
-  return (
-    <div className="textarea terminal">
-      <ReactJson
-        src={output}
-        displayDataTypes={false}
-        theme="solarized"
-        name={false}
-        displayObjectSize={false}
+
+  return !output ? (
+    <div></div>
+  ) : (
+    <div className="textarea editor">
+      <Editor
+        theme="vs-dark"
+        value={JSON.stringify(output, null, 2)}
+        width="100%"
+        height="100%"
+        defaultLanguage="json"
+        defaultValue=""
+        options={{ domReadOnly: true, readOnly: true }}
       />
-      {/* <textarea
-        rows="50"
-        cols="100"
-        disabled
-        value={output ? JSON.stringify(output, null, 2) : ""}
-      /> */}
     </div>
   );
 };

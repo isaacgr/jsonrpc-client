@@ -1,23 +1,23 @@
-.content-block.content-block--flex {
-  & > * {
-    margin: 0 1rem;
-  }
-}
-
 .button.MuiButton-root {
   margin: 1rem;
-}
-
-.error-message {
-  color: #e74c3c;
-  margin: 0 auto;
-  margin-top: 1rem;
-  text-align: center;
 }
 
 .textarea {
   margin: 0 auto;
   margin-top: 5rem;
+  margin-bottom: 10rem;
+}
+
+.editor {
+  resize: both;
+  overflow: hidden;
+  height: 30vh;
+  width: 80%;
+  margin: 0 auto;
+}
+
+.textarea.editor {
+  height: 50vh;
 }
 
 .react-json-view {

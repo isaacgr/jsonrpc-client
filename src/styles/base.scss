@@ -184,3 +184,9 @@ a:focus {
 .content-block--flex > * {
   margin: 0 1rem;
 }
+
+.content-block.content-block--flex {
+  & > * {
+    margin: 0 1rem;
+  }
+}

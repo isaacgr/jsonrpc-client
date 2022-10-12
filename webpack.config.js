@@ -9,7 +9,7 @@ module.exports = {
     ignored: /node_modules/,
     poll: true
   },
-  entry: "./index.js",
+  entry: "./src/index.js",
   output: {
     path: path.join(__dirname, "public"),
     filename: "bundle.js"

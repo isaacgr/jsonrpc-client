@@ -11,11 +11,11 @@ const Submit = ({ result, error, submitting }) => {
   });
   useEffect(() => {
     if (submitting) {
-      setButtonState({ color: "warning", text: "Submitting..." });
+      setButtonState({ color: "warning", text: "Sending..." });
     } else if (!result || error) {
-      setButtonState({ color: "primary", text: "Submit" });
+      setButtonState({ color: "primary", text: "Send" });
     } else if (result) {
-      setButtonState({ color: "success", text: "Submit" });
+      setButtonState({ color: "success", text: "Send" });
     }
   }, [result, error, submitting]);
   return (

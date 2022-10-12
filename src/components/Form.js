@@ -17,13 +17,13 @@ const Form = ({ state, setState, onSubmit, connect, formatJson }) => (
       setState={setState}
       connect={connect}
     />
+    <FormSelectors queryType={state.queryType} setState={setState} />
     <DataEntry
       method={state.method}
       params={state.params}
       formatJson={formatJson}
       setState={setState}
     />
-    <FormSelectors queryType={state.queryType} setState={setState} />
     <Submit
       result={state.response}
       error={state.error}

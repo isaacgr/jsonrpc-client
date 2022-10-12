@@ -1,9 +1,29 @@
-import React from "react";
+import React, { useRef } from "react";
 import TextField from "@mui/material/TextField";
-import Button from "@mui/material/Button";
-import TextareaAutosize from "@mui/material/TextareaAutosize";
+import Editor from "@monaco-editor/react";
 
 const DataEntry = ({ method, params, setState, formatJson }) => {
+  const monacoRef = useRef(null);
+
+  const handleEditorDidMount = (editor, monaco) => {
+    monacoRef.current = editor;
+    const jsonDefaults = monaco.languages.json.jsonDefaults;
+    jsonDefaults.setModeConfiguration({
+      ...jsonDefaults.modeConfiguration,
+      documentFormattingEdits: false,
+      documentRangeFormattingEdits: false
+    });
+    monaco.languages.registerDocumentFormattingEditProvider("json", {
+      provideDocumentFormattingEdits: function (model, options, token) {
+        return [
+          {
+            text: formatJson(model.getValue()),
+            range: model.getFullModelRange()
+          }
+        ];
+      }
+    });
+  };
   return (
     <div>
       <div className="content-block">
@@ -20,41 +40,24 @@ const DataEntry = ({ method, params, setState, formatJson }) => {
         />
       </div>
       <div className="content-block">
-        <TextareaAutosize
-          placeholder="Params"
-          minRows={10}
-          style={{ width: "50%" }}
-          value={params || ""}
-          onChange={(e) =>
-            setState((prevState) => ({
-              ...prevState,
-              params: e.target.value
-            }))
-          }
-        />
-        {/* <TextField
-          style={{ width: "80%" }}
-          rows={10}
-          multiline
-          label="Params"
-          value={params || ""}
-          onChange={(e) =>
-            setState((prevState) => ({
-              ...prevState,
-              params: e.target.value
-            }))
-          }
-        /> */}
+        <div className="editor">
+          <Editor
+            onChange={(value, e) =>
+              setState((prevState) => ({
+                ...prevState,
+                params: value || ""
+              }))
+            }
+            value={params || ""}
+            width="100%"
+            height="100%"
+            defaultLanguage="json"
+            defaultValue=""
+            theme="vs-dark"
+            onMount={handleEditorDidMount}
+          />
+        </div>
       </div>
-      <Button
-        className="button"
-        color="secondary"
-        variant="outlined"
-        value={params}
-        onClick={formatJson}
-      >
-        Prettify
-      </Button>
     </div>
   );
 };
