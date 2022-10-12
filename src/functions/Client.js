@@ -3,7 +3,10 @@ import { v4 as uuidv4 } from "uuid";
 
 class Client {
   constructor() {
-    this.ws = new Jaysonic.wsclient({ timeout: 600 });
+    this.ws = new Jaysonic.wsclient({
+      url: `ws://${window.location.host.split(":")[0]}:8100`,
+      timeout: 600
+    });
     this.clientId = uuidv4();
   }
 

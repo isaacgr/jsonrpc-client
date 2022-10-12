@@ -3,7 +3,7 @@ const express = require("express");
 const Jaysonic = require("jaysonic");
 const ClientHandler = require("./functions/ClientHandler");
 
-const wss = new Jaysonic.server.ws();
+const wss = new Jaysonic.server.ws({ host: "0.0.0.0" });
 const clientHandler = new ClientHandler();
 
 const publicPath = path.join(__dirname, "..", "public");
