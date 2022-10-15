@@ -5,13 +5,17 @@ class Client {
   constructor() {
     this.ws = new Jaysonic.wsclient({
       url: `ws://${window.location.host.split(":")[0]}:8100`,
-      timeout: 600
+      timeout: 999999
     });
     this.clientId = uuidv4();
   }
 
   init() {
     return this.ws.connect();
+  }
+
+  disconnect() {
+    return this.ws.request().send("disconnect", [this.clientId]);
   }
 
   connect(host, port, delimiter, timeout) {

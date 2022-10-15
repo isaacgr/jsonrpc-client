@@ -28,13 +28,40 @@ const server = app.listen(port, () => {
 });
 
 const tcpDisconnected = (clientId) => {
-  console.log("TCP server disconnected");
+  console.log("Disconnected from TCP Server");
   // delete ws client reference from handler class
   clientHandler.removeClient(clientId);
   wss.notify([["tcp.disconnect", [clientId]]]);
 };
 
+wss.method("disconnect", ([clientId]) => {
+  return new Promise((resolve, reject) => {
+    if (clientHandler.tcpClient(clientId)) {
+      const { host, port } = clientHandler.tcpClient(clientId).server;
+      clientHandler.tcpClient(clientId).end(() => {
+        resolve({
+          message: "Connection ended.",
+          host,
+          port,
+          clientId
+        });
+      });
+    } else {
+      reject({
+        message: "Client has no active connections.",
+        clientId
+      });
+    }
+  });
+});
+
 wss.method("connect", ({ host, port, delimiter, timeout, clientId }) => {
+  if (clientHandler.wsClientToTcp[clientId]) {
+    return Promise.resolve({
+      ...clientHandler.tcpClient(clientId).server,
+      message: `Client already connected. [${clientId}].`
+    });
+  }
   // create a new tcp client for this client id
   clientHandler.newClient(host, port, delimiter, timeout, clientId);
   // subscribe the tcp server to serverDisconnected

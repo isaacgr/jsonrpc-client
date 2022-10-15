@@ -12,10 +12,11 @@ const ConnectionOptions = ({
   port,
   connectedHost,
   delimiter,
-  connectionTimeout,
+  responseTimeout,
   connected,
   setState,
-  connect
+  connect,
+  disconnect
 }) => {
   return (
     <div className="content-block ">
@@ -72,9 +73,9 @@ const ConnectionOptions = ({
           size="small"
           id="timeout"
           type="number"
-          label="Connection Timeout"
+          label="Response Timeout"
           variant="outlined"
-          value={connectionTimeout}
+          value={responseTimeout}
           onChange={(e) =>
             setState((prevState) => ({
               ...prevState,
@@ -86,16 +87,26 @@ const ConnectionOptions = ({
       <div className="content-block">
         <Chip
           label={connected ? `Connected to ${connectedHost}` : "Not connected"}
+          variant="outlined"
+          color={connected ? "success" : "default"}
         />
       </div>
       <div className="content-block">
         <Button
           className="button"
-          variant={connected ? "contained" : "outlined"}
-          color={connected ? "success" : "primary"}
+          disabled={connected ? true : false}
+          variant="contained"
           onClick={connect}
         >
           Connect
+        </Button>
+        <Button
+          className="button"
+          disabled={!connected ? true : false}
+          variant="contained"
+          onClick={disconnect}
+        >
+          Disconnect
         </Button>
       </div>
     </div>

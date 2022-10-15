@@ -9,10 +9,6 @@ class ClientHandler {
   }
 
   newClient(host, port, delimiter, timeout, clientId) {
-    if (this.wsClientToTcp[clientId]) {
-      console.log(`Client connection exists. Re-using. [${clientId}]`);
-      return;
-    }
     const Client = new Jaysonic.client.tcp({
       host,
       port,

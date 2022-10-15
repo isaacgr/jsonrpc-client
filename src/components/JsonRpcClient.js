@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
 import Form from "./Form";
 import Client from "../functions/Client";
-import ErrorMessage from "./ErrorMessage";
 import Terminal from "./Terminal";
 import CurrentSubscriptions from "./CurrentSubscriptions";
 import Alert from "@mui/material/Alert";
@@ -24,6 +23,36 @@ const JsonRpcClient = () => {
     queryType: "request",
     timeout: 30
   });
+
+  const disconnect = async () => {
+    try {
+      const { result } = await client.disconnect();
+      console.log(result);
+      setState((prevState) => ({
+        ...prevState,
+        connected: false,
+        connectedHost: ""
+      }));
+    } catch (e) {
+      if (e instanceof Error) {
+        setState((prevState) => ({
+          ...prevState,
+          submitting: false,
+          response: null,
+          error: e.message
+        }));
+      } else {
+        setState((prevState) => ({
+          ...prevState,
+          error: `${e.error.message}${
+            e.error.data ? ` : ${e.error.data}` : ""
+          }`,
+          connected: false,
+          connectedHost: ""
+        }));
+      }
+    }
+  };
 
   const connect = async () => {
     const { host, port, delimiter, timeout } = state;
@@ -50,7 +79,9 @@ const JsonRpcClient = () => {
       } else {
         setState((prevState) => ({
           ...prevState,
-          error: e.error.message,
+          error: `${e.error.message}${
+            e.error.data ? ` : ${e.error.data}` : ""
+          }`,
           connected: false,
           connectedHost: ""
         }));
@@ -109,17 +140,6 @@ const JsonRpcClient = () => {
         error: e.error.message
       }));
     }
-  };
-
-  const formatJson = (value) => {
-    var ugly = value.replace(/'/g, '"').replace(/\bNone\b(?!")/g, null);
-    var obj = JSON.parse(ugly);
-    var pretty = JSON.stringify(obj, undefined, 2);
-    setState((prevState) => ({
-      ...prevState,
-      params: pretty
-    }));
-    return pretty;
   };
 
   const sendRequest = async (queryType) => {
@@ -184,7 +204,9 @@ const JsonRpcClient = () => {
           ...prevState,
           submitting: false,
           response: JSON.parse(e.error.message),
-          error: JSON.parse(e.error.message).error?.message
+          error: `${JSON.parse(e.error.message).error?.message}${
+            e.error.data ? ` : ${e.error.data}` : ""
+          }`
         }));
       }
     }
@@ -231,7 +253,7 @@ const JsonRpcClient = () => {
         setState={setState}
         onSubmit={onSubmit}
         connect={connect}
-        formatJson={formatJson}
+        disconnect={disconnect}
       />
       {state.subscriptions.length > 0 && (
         <CurrentSubscriptions

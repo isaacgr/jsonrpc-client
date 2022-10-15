@@ -5,14 +5,27 @@ import Editor from "@monaco-editor/react";
 const TerminalWrapper = ({ text }) => {
   let output = null;
   if (text) {
-    if (text.error) {
-      output = text;
-    } else if (text.result) {
-      output = text.result;
-    } else if (text.params) {
-      output = text.params;
-    } else {
-      output = { internalMessage: text };
+    try {
+      if (text.error) {
+        output = text;
+      } else if (text.result) {
+        output = text.result;
+      } else if (text.params) {
+        output = text.params;
+      } else {
+        output = { internalMessage: text };
+      }
+      output = JSON.stringify(output, null, 2);
+    } catch (e) {
+      if (e instanceof RangeError) {
+        try {
+          output = JSON.stringify(output);
+        } catch (e) {
+          output = JSON.stringify({ internalMessage: e.message }, null, 2);
+        }
+      } else {
+        output = JSON.stringify({ internalMessage: e.message }, null, 2);
+      }
     }
   }
 
@@ -22,12 +35,16 @@ const TerminalWrapper = ({ text }) => {
     <div className="textarea editor">
       <Editor
         theme="vs-dark"
-        value={JSON.stringify(output, null, 2)}
+        value={output}
         width="100%"
         height="100%"
         defaultLanguage="json"
         defaultValue=""
-        options={{ domReadOnly: true, readOnly: true }}
+        options={{
+          domReadOnly: true,
+          readOnly: true,
+          wordWrap: "wordWrapColumn"
+        }}
       />
     </div>
   );
