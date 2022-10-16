@@ -139,12 +139,18 @@ wss.method(
 );
 
 wss.method("start.subscribe", ([method, clientId]) => {
+  if (!clientHandler.wsClientToTcp[clientId]) {
+    return Promise.reject(`Client has no active connection. [${clientId}].`);
+  }
   const subs = clientHandler.subscriptionHandler(wss, method);
   clientHandler.tcpClient(clientId).subscribe(method, subs);
   return `Subscribed to "${method}"`;
 });
 
 wss.method("stop.subscribe", ([method, clientId]) => {
+  if (!clientHandler.wsClientToTcp[clientId]) {
+    return Promise.reject(`Client has no active connection. [${clientId}].`);
+  }
   clientHandler.tcpClient(clientId).unsubscribeAll(method);
   return `Unsubscribed from ${method}`;
 });

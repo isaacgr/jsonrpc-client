@@ -35,7 +35,7 @@ const FormSelectors = ({ queryType, setState }) => {
           }
           label="Notify"
         />
-        <FormControlLabel
+        {/* <FormControlLabel
           control={
             <Checkbox
               onChange={(e) =>
@@ -50,7 +50,7 @@ const FormSelectors = ({ queryType, setState }) => {
             />
           }
           label="Subscribe"
-        />
+        /> */}
       </div>
     </FormGroup>
   );

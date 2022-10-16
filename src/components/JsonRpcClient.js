@@ -16,7 +16,6 @@ const JsonRpcClient = () => {
     submitting: false,
     connected: false,
     subscribing: false,
-    subscriptions: [],
     method: "",
     params: null,
     response: null,
@@ -120,25 +119,65 @@ const JsonRpcClient = () => {
     }));
   };
 
-  const stopSubscribe = async (unsubscribe) => {
-    // e.preventDefault();
-    const { subscriptions } = state;
-    const method = unsubscribe;
+  const startSubscribe = async (method) => {
     try {
-      await client.stopSubscribe(method, handleSubscriptionUpdates);
-      const newSubs = subscriptions.filter((value) => value !== method);
+      if (Object.keys(client.ws.getEventListeners()).includes(method)) {
+        throw new Error("Method already subscribed.");
+      }
+      await client.startSubscribe(method, handleSubscriptionUpdates);
       setState((prevState) => ({
         ...prevState,
-        submitting: false,
-        subscriptions: newSubs
+        submitting: false
       }));
     } catch (e) {
       console.log(e);
+      if (e instanceof Error) {
+        setState((prevState) => ({
+          ...prevState,
+          response: null,
+          error: e.message
+        }));
+      } else {
+        const errorMessage = JSON.parse(e.error.message);
+        setState((prevState) => ({
+          ...prevState,
+          response: errorMessage,
+          error: `${
+            errorMessage.error ? errorMessage.error.message : errorMessage
+          }${e.error.data ? ` : ${e.error.data}` : ""}`
+        }));
+      }
+    }
+  };
+
+  const stopSubscribe = async (method) => {
+    try {
+      if (!Object.keys(client.ws.getEventListeners()).includes(method)) {
+        throw new Error("Method not currently subscribed.");
+      }
+      await client.stopSubscribe(method, handleSubscriptionUpdates);
       setState((prevState) => ({
         ...prevState,
-        submitting: false,
-        error: e.error.message
+        submitting: false
       }));
+    } catch (e) {
+      console.log(e);
+      if (e instanceof Error) {
+        setState((prevState) => ({
+          ...prevState,
+          response: null,
+          error: e.message
+        }));
+      } else {
+        const errorMessage = JSON.parse(e.error.message);
+        setState((prevState) => ({
+          ...prevState,
+          response: errorMessage,
+          error: `${
+            errorMessage.error ? errorMessage.error.message : errorMessage
+          }${e.error.data ? ` : ${e.error.data}` : ""}`
+        }));
+      }
     }
   };
 
@@ -175,18 +214,6 @@ const JsonRpcClient = () => {
             error: ""
           }));
           break;
-        case "subscribe":
-          const { subscriptions } = state;
-          if (subscriptions.includes(method)) {
-            throw new Error("Method already subscribed.");
-          }
-          await client.startSubscribe(method, handleSubscriptionUpdates);
-          setState((prevState) => ({
-            ...prevState,
-            submitting: false,
-            subscriptions: [...prevState.subscriptions, method]
-          }));
-          break;
         default:
           break;
       }
@@ -200,13 +227,13 @@ const JsonRpcClient = () => {
           error: e.message
         }));
       } else {
+        const errorMessage = JSON.parse(e.error.message);
         setState((prevState) => ({
           ...prevState,
-          submitting: false,
-          response: JSON.parse(e.error.message),
-          error: `${JSON.parse(e.error.message).error?.message}${
-            e.error.data ? ` : ${e.error.data}` : ""
-          }`
+          response: errorMessage,
+          error: `${
+            errorMessage.error ? errorMessage.error.message : errorMessage
+          }${e.error.data ? ` : ${e.error.data}` : ""}`
         }));
       }
     }
@@ -255,10 +282,10 @@ const JsonRpcClient = () => {
         connect={connect}
         disconnect={disconnect}
       />
-      {state.subscriptions.length > 0 && (
+      {state.connected && (
         <CurrentSubscriptions
-          subscriptions={state.subscriptions}
           stopSubscribe={stopSubscribe}
+          startSubscribe={startSubscribe}
         />
       )}
       <div className="content-block">

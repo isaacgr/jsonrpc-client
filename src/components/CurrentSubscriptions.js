@@ -1,49 +1,26 @@
-import React, { useState } from "react";
-import TextField from "@mui/material/TextField";
-import Autocomplete from "@mui/material/Autocomplete";
-import Button from "@mui/material/Button";
+import React from "react";
+import SubscriptionsInput from "./SubscriptionsInput";
 import PropTypes from "prop-types";
 
-const CurrentSubscriptions = ({ subscriptions, stopSubscribe }) => {
-  const [currentSubscription, setCurrentSubscription] = useState(
-    subscriptions[0]
-  );
+const CurrentSubscriptions = ({ stopSubscribe, startSubscribe }) => {
   return (
-    <div className="content-block content-block--flex">
-      <Autocomplete
-        disablePortal
-        id="unsubscribe"
-        autoSelect
-        autoHighlight
-        size="small"
-        disableClearable
-        value={currentSubscription}
-        options={subscriptions}
-        sx={{ width: 300 }}
-        onChange={(e, newValue) => setCurrentSubscription(newValue)}
-        renderInput={(params) => (
-          <TextField
-            {...params}
-            label="Subscribed Methods"
-            variant="outlined"
-          />
-        )}
-      />
-      <Button
+    <div className="content-block">
+      <SubscriptionsInput
+        startSubscribe={startSubscribe}
+        stopSubscribe={stopSubscribe}
+        fullWidth
         variant="outlined"
-        onClick={() => {
-          stopSubscribe(currentSubscription);
-          setCurrentSubscription(subscriptions[0]);
-        }}
-      >
-        Stop Subscribing
-      </Button>
+        id="subscriptions"
+        name="subscriptions"
+        placeholder="Add methods to subscribe to"
+        label="Subscriptions"
+      />
     </div>
   );
 };
 
 CurrentSubscriptions.propTypes = {
-  subscriptions: PropTypes.arrayOf(PropTypes.string).isRequired,
+  startSubscribe: PropTypes.func.isRequired,
   stopSubscribe: PropTypes.func.isRequired
 };
 
