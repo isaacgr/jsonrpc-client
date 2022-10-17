@@ -230,6 +230,7 @@ const JsonRpcClient = () => {
         const errorMessage = JSON.parse(e.error.message);
         setState((prevState) => ({
           ...prevState,
+          submitting: false,
           response: errorMessage,
           error: `${
             errorMessage.error ? errorMessage.error.message : errorMessage
