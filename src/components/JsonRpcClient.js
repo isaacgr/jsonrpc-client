@@ -1,83 +1,107 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import Form from "./Form";
 import Client from "../functions/Client";
-import ErrorMessage from "./ErrorMessage";
 import Terminal from "./Terminal";
 import CurrentSubscriptions from "./CurrentSubscriptions";
+import Alert from "@mui/material/Alert";
 
-class JsonRpcClient extends React.Component {
-  constructor() {
-    super();
-    this.state = {
-      error: "",
-      host: "",
-      delimiter: "\r\n",
-      port: undefined,
-      submitting: false,
-      connected: false,
-      subscribing: false,
-      subscriptions: [],
-      method: "",
-      params: null,
-      response: null,
-      timeout: 30
-    };
-  }
+const JsonRpcClient = () => {
+  const [client] = useState(new Client());
+  const [state, setState] = useState({
+    error: "",
+    host: "",
+    delimiter: "\r\n",
+    port: null,
+    connectedHost: "",
+    submitting: false,
+    connected: false,
+    subscribing: false,
+    method: "",
+    params: null,
+    response: null,
+    queryType: "request",
+    timeout: 30
+  });
 
-  componentDidMount() {
-    this.client = new Client();
-    this.client
-      .init()
-      .then(() => {
-        console.log("WS client connected.");
-      })
-      .catch((response) => {
-        this.setState((prevState) => ({
+  const disconnect = async () => {
+    try {
+      const { result } = await client.disconnect();
+      console.log(result);
+      setState((prevState) => ({
+        ...prevState,
+        connected: false,
+        connectedHost: ""
+      }));
+    } catch (e) {
+      if (e instanceof Error) {
+        setState((prevState) => ({
           ...prevState,
           submitting: false,
-          response,
-          error: response.error.message
+          response: null,
+          error: e.message
         }));
-      });
-    this.client.serverDisconnected(() => {
-      this.setState((prevState) => ({
-        ...prevState,
-        submitting: false,
-        subscribing: false,
-        connected: false,
-        error: "Server disconnected"
-      }));
-    });
-  }
+      } else {
+        setState((prevState) => ({
+          ...prevState,
+          error: `${e.error.message}${
+            e.error.data ? ` : ${e.error.data}` : ""
+          }`,
+          connected: false,
+          connectedHost: ""
+        }));
+      }
+    }
+  };
 
-  onSubmit = (e) => {
+  const connect = async () => {
+    const { host, port, delimiter, timeout } = state;
+    setState((prevState) => ({
+      ...prevState,
+      connected: false,
+      error: ""
+    }));
+    try {
+      const { result } = await client.connect(host, port, delimiter, timeout);
+      setState((prevState) => ({
+        ...prevState,
+        connected: true,
+        connectedHost: `${result.host}:${result.port}`
+      }));
+    } catch (e) {
+      if (e instanceof Error) {
+        setState((prevState) => ({
+          ...prevState,
+          submitting: false,
+          response: null,
+          error: e.message
+        }));
+      } else {
+        setState((prevState) => ({
+          ...prevState,
+          error: `${e.error.message}${
+            e.error.data ? ` : ${e.error.data}` : ""
+          }`,
+          connected: false,
+          connectedHost: ""
+        }));
+      }
+    }
+  };
+
+  const onSubmit = (e) => {
     e.preventDefault();
     console.log("Form submitted");
-    const { request, notify, subscribe } = this.state;
-    if (!request && !notify && !subscribe) {
-      this.setState((prevState) => ({
+    if (!state.queryType) {
+      setState((prevState) => ({
         ...prevState,
         error: "Please choose a request type"
       }));
       return;
     }
     try {
-      if (request) {
-        this.request();
-      } else if (notify) {
-        this.notify();
-      } else if (subscribe) {
-        this.startSubscribe();
-      } else {
-        return;
-      }
-      this.setState((prevState) => ({
-        ...prevState,
-        submitting: true,
-        error: ""
-      }));
+      sendRequest(state.queryType);
     } catch (e) {
-      this.setState((prevState) => ({
+      setState((prevState) => ({
         ...prevState,
         submitting: false,
         error: e.message
@@ -85,67 +109,8 @@ class JsonRpcClient extends React.Component {
     }
   };
 
-  connect = () => {
-    const { host, port, delimiter, timeout } = this.state;
-    return this.client.connect(host, port, delimiter, timeout);
-  };
-
-  request = () => {
-    const { connected, params } = this.state;
-    if (!connected) {
-      throw new Error("Not connected");
-    }
-    const { method } = this.state;
-    const parameters = JSON.parse(params);
-    this.client
-      .request(method, parameters)
-      .then((response) => {
-        this.setState((prevState) => ({
-          ...prevState,
-          submitting: false,
-          response,
-          error: ""
-        }));
-      })
-      .catch((response) => {
-        this.setState((prevState) => ({
-          ...prevState,
-          submitting: false,
-          response,
-          error: JSON.parse(response.error.message).error.message
-        }));
-      });
-  };
-
-  notify = () => {
-    const { connected, params } = this.state;
-    if (!connected) {
-      throw new Error("Not connected");
-    }
-    const { method } = this.state;
-    const parameters = JSON.parse(params);
-    this.client
-      .notify(method, parameters)
-      .then((response) => {
-        this.setState((prevState) => ({
-          ...prevState,
-          submitting: false,
-          response: `Notification sent: ${response.result[0]}`,
-          error: ""
-        }));
-      })
-      .catch((response) => {
-        this.setState((prevState) => ({
-          ...prevState,
-          submitting: false,
-          response,
-          error: `Error when sending notification: ${response.error.message}`
-        }));
-      });
-  };
-
-  handleSubscriptionUpdates = ({ detail }) => {
-    this.setState((prevState) => ({
+  const handleSubscriptionUpdates = ({ detail }) => {
+    setState((prevState) => ({
       ...prevState,
       submitting: false,
       response: detail,
@@ -154,184 +119,190 @@ class JsonRpcClient extends React.Component {
     }));
   };
 
-  startSubscribe = () => {
-    const { connected, subscriptions } = this.state;
-    if (!connected) {
-      throw new Error("Not connected");
-    }
-    const { method } = this.state;
-    if (subscriptions.includes(method)) {
-      return;
-    }
-    this.client
-      .startSubscribe(method, this.handleSubscriptionUpdates)
-      .then(() => {
-        this.setState(
-          (prevState) => ({
-            ...prevState,
-            submitting: false,
-            subscriptions: [...prevState.subscriptions, method]
-          }),
-          () => {
-            const { subscriptions } = this.state;
-            if (subscriptions.length === 1) {
-              this.setState((prevState) => ({
-                ...prevState,
-                unsubscribe: prevState.subscriptions[0]
-              }));
-            }
-          }
-        );
-      })
-      .catch((response) => {
-        this.setState((prevState) => ({
+  const startSubscribe = async (method) => {
+    try {
+      if (Object.keys(client.ws.getEventListeners()).includes(method)) {
+        throw new Error("Method already subscribed.");
+      }
+      await client.startSubscribe(method, handleSubscriptionUpdates);
+      setState((prevState) => ({
+        ...prevState,
+        submitting: false
+      }));
+    } catch (e) {
+      console.log(e);
+      if (e instanceof Error) {
+        setState((prevState) => ({
           ...prevState,
-          submitting: false,
-          response,
-          error: response.error.message
+          response: null,
+          error: e.message
         }));
-      });
+      } else {
+        const errorMessage = JSON.parse(e.error.message);
+        setState((prevState) => ({
+          ...prevState,
+          response: errorMessage,
+          error: `${
+            errorMessage.error ? errorMessage.error.message : errorMessage
+          }${e.error.data ? ` : ${e.error.data}` : ""}`
+        }));
+      }
+    }
   };
 
-  stopSubscribe = () => {
-    // e.preventDefault();
-    const { subscriptions, unsubscribe } = this.state;
-    const method = unsubscribe;
-    this.client
-      .stopSubscribe(method, this.handleSubscriptionUpdates)
-      .then(() => {
-        const newSubs = subscriptions.filter((value) => value !== method);
-        this.setState(
-          (prevState) => ({
-            ...prevState,
-            submitting: false,
-            subscriptions: newSubs
-          }),
-          () => {
-            const { subscriptions } = this.state;
-            if (subscriptions.length === 1) {
-              this.setState((prevState) => ({
-                ...prevState,
-                unsubscribe: prevState.subscriptions[0]
-              }));
-            }
-          }
-        );
-      })
-      .catch((response) => {
-        this.setState((prevState) => ({
+  const stopSubscribe = async (method) => {
+    try {
+      if (!Object.keys(client.ws.getEventListeners()).includes(method)) {
+        throw new Error("Method not currently subscribed.");
+      }
+      await client.stopSubscribe(method, handleSubscriptionUpdates);
+      setState((prevState) => ({
+        ...prevState,
+        submitting: false
+      }));
+    } catch (e) {
+      console.log(e);
+      if (e instanceof Error) {
+        setState((prevState) => ({
           ...prevState,
-          submitting: false,
-          response,
-          error: response.error.message
+          response: null,
+          error: e.message
         }));
-      });
+      } else {
+        const errorMessage = JSON.parse(e.error.message);
+        setState((prevState) => ({
+          ...prevState,
+          response: errorMessage,
+          error: `${
+            errorMessage.error ? errorMessage.error.message : errorMessage
+          }${e.error.data ? ` : ${e.error.data}` : ""}`
+        }));
+      }
+    }
   };
 
-  formatJson = () => {
-    var ugly = this.state.params.replace(/'/g, '"').replace(/\bNone\b(?!")/g, null);
-    var obj = JSON.parse(ugly);
-    var pretty = JSON.stringify(obj, undefined, 2);
-    this.setState((prevState) => ({
+  const sendRequest = async (queryType) => {
+    const { connected, params } = state;
+    const parameters = JSON.parse(params);
+    let response;
+    setState((prevState) => ({
       ...prevState,
-      params: pretty
+      submitting: true,
+      error: ""
     }));
+    try {
+      if (!connected) {
+        throw new Error("Not connected");
+      }
+      const { method } = state;
+      switch (queryType) {
+        case "request":
+          response = await client.request(method, parameters);
+          setState((prevState) => ({
+            ...prevState,
+            submitting: false,
+            response,
+            error: ""
+          }));
+          break;
+        case "notify":
+          response = await client.notify(method, parameters);
+          setState((prevState) => ({
+            ...prevState,
+            submitting: false,
+            response: `Notification sent: ${response.result}`,
+            error: ""
+          }));
+          break;
+        default:
+          break;
+      }
+    } catch (e) {
+      console.log(e);
+      if (e instanceof Error) {
+        setState((prevState) => ({
+          ...prevState,
+          submitting: false,
+          response: null,
+          error: e.message
+        }));
+      } else {
+        const errorMessage = JSON.parse(e.error.message);
+        setState((prevState) => ({
+          ...prevState,
+          response: errorMessage,
+          error: `${
+            errorMessage.error ? errorMessage.error.message : errorMessage
+          }${e.error.data ? ` : ${e.error.data}` : ""}`
+        }));
+      }
+    }
   };
 
-  buttonPressed = () => {
-    this.connect()
-      .then((response) => {
-        this.setState((prevState) => ({
-          ...prevState,
-          connected: true,
-          submitting: false,
-          response,
-          error: ""
-        }));
+  useEffect(() => {
+    client
+      .init()
+      .then(() => {
+        console.log("WS client connected.");
       })
       .catch((response) => {
-        this.setState((prevState) => ({
+        setState((prevState) => ({
           ...prevState,
           submitting: false,
-          connected: false,
           response,
           error: response.error.message
         }));
       });
-  };
+    client.ping(() => {
+      setState((prevState) => ({
+        ...prevState,
+        submitting: false,
+        subscribing: false,
+        connected: false,
+        error: "WS Server disconnected"
+      }));
+    });
+    client.tcpServerDisconnected(() => {
+      setState((prevState) => ({
+        ...prevState,
+        submitting: false,
+        subscribing: false,
+        connected: false,
+        error: "TCP Server disconnected"
+      }));
+    });
+  }, []);
 
-  handleChange = (e) => {
-    const { name } = e.target;
-    const value =
-      e.target.type === "checkbox" ? e.target.checked : e.target.value;
-    switch (name) {
-      case "request":
-        this.setState((prevState) => ({
-          ...prevState,
-          [name]: value,
-          response: null,
-          subscribe: false,
-          notify: false
-        }));
-        break;
-      case "notify":
-        this.setState((prevState) => ({
-          ...prevState,
-          [name]: value,
-          request: false,
-          response: null,
-          subscribe: false
-        }));
-        break;
-      case "subscribe":
-        this.setState((prevState) => ({
-          ...prevState,
-          [name]: value,
-          request: false,
-          response: null,
-          notify: false
-        }));
-        break;
-      case "params":
-        this.setState((prevState) => ({
-          ...prevState,
-          [name]: value === "" ? null : value
-        }));
-        break;
-      default:
-        this.setState((prevState) => ({
-          ...prevState,
-          [name]: value
-        }));
-        break;
-    }
-  };
-
-  render() {
-    const { subscriptions, error, submitting, response } = this.state;
-    return (
-      <div className="container">
-        <Form
-          state={this.state}
-          onSubmit={this.onSubmit}
-          handleChange={this.handleChange}
-          buttonPressed={this.buttonPressed}
-          formatJson={this.formatJson}
+  return (
+    <div className="container">
+      <Form
+        state={state}
+        setState={setState}
+        onSubmit={onSubmit}
+        connect={connect}
+        disconnect={disconnect}
+      />
+      {state.connected && (
+        <CurrentSubscriptions
+          stopSubscribe={stopSubscribe}
+          startSubscribe={startSubscribe}
         />
-        {subscriptions.length > 0 ? (
-          <CurrentSubscriptions
-            subscriptions={subscriptions}
-            stopSubscribe={this.stopSubscribe}
-            handleChange={this.handleChange}
-          />
+      )}
+      <div className="content-block">
+        {state.error && !state.submitting ? (
+          <Alert
+            style={{ width: "50%", margin: "0 auto 1rem auto" }}
+            severity="error"
+          >
+            {state.error}
+          </Alert>
         ) : (
           ""
         )}
-        {error && !submitting ? <ErrorMessage message={error} /> : ""}
-        <Terminal text={response} />
       </div>
-    );
-  }
-}
+      <Terminal text={state.response} />
+    </div>
+  );
+};
 
 export default JsonRpcClient;

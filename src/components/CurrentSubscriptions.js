@@ -1,36 +1,26 @@
-import React from 'react';
-import PropTypes from 'prop-types';
+import React from "react";
+import SubscriptionsInput from "./SubscriptionsInput";
+import PropTypes from "prop-types";
 
-const CurrentSubscriptions = ({
-  handleChange,
-  subscriptions,
-  stopSubscribe
-}) => (
-  <form className="form">
-    <div className="form__section">
-      <p className="form__label">Currently Subscribed Methods</p>
-      <select
-        className="form__input"
-        name="unsubscribe"
-        onChange={handleChange}
-        defaultValue={subscriptions[0]}
-      >
-        {subscriptions.map((sub) => (
-          <option key={sub} value={sub}>
-            {sub}
-          </option>
-        ))}
-      </select>
-      <button type="button" onClick={stopSubscribe}>
-        Stop Subscribing
-      </button>
+const CurrentSubscriptions = ({ stopSubscribe, startSubscribe }) => {
+  return (
+    <div className="content-block">
+      <SubscriptionsInput
+        startSubscribe={startSubscribe}
+        stopSubscribe={stopSubscribe}
+        fullWidth
+        variant="outlined"
+        id="subscriptions"
+        name="subscriptions"
+        placeholder="Add methods to subscribe to"
+        label="Subscriptions"
+      />
     </div>
-  </form>
-);
+  );
+};
 
 CurrentSubscriptions.propTypes = {
-  handleChange: PropTypes.func.isRequired,
-  subscriptions: PropTypes.arrayOf(PropTypes.string).isRequired,
+  startSubscribe: PropTypes.func.isRequired,
   stopSubscribe: PropTypes.func.isRequired
 };
 

@@ -1,51 +1,57 @@
-import React from 'react';
-import ReactJson from 'react-json-view';
-import PropTypes from 'prop-types';
+import React from "react";
+import PropTypes from "prop-types";
+import Editor from "@monaco-editor/react";
 
 const TerminalWrapper = ({ text }) => {
-  let output;
+  let output = null;
   if (text) {
-    if (text.error) {
-      console.log(text.error.message);
-      const errorText = JSON.parse(text.error.message);
-      if (typeof errorText === 'string') {
-        output = { internalMessage: errorText };
+    try {
+      if (text.error) {
+        output = text;
+      } else if (text.result) {
+        output = text.result;
+      } else if (text.params) {
+        output = text.params;
       } else {
-        output = errorText;
+        output = { internalMessage: text };
       }
-    } else if (text.result) {
-      if (text.result[0].result) {
-        output = text.result[0];
+      output = JSON.stringify(output, null, 2);
+    } catch (e) {
+      if (e instanceof RangeError) {
+        try {
+          output = JSON.stringify(output);
+        } catch (e) {
+          output = JSON.stringify({ internalMessage: e.message }, null, 2);
+        }
       } else {
-        output = text.result[0];
+        output = JSON.stringify({ internalMessage: e.message }, null, 2);
       }
-    } else if (text.params) {
-      output = text.params[0];
-    } else {
-      output = { internalMessage: text };
     }
   }
-  return (
-    <div className="form__section textarea terminal">
-      <ReactJson
-        src={output}
-        displayDataTypes={false}
-        theme="solarized"
-        name={false}
-        displayObjectSize={false}
+
+  return !output ? (
+    <div></div>
+  ) : (
+    <div className="textarea editor">
+      <Editor
+        theme="vs-dark"
+        value={output}
+        width="100%"
+        height="100%"
+        defaultLanguage="json"
+        defaultValue=""
+        options={{
+          domReadOnly: true,
+          readOnly: true,
+          wordWrap: "wordWrapColumn"
+        }}
       />
-      {/* <textarea
-        rows="50"
-        cols="100"
-        disabled
-        value={props.text ? JSON.stringify(text, null, 2) : ""}
-      /> */}
     </div>
   );
 };
 
 TerminalWrapper.propTypes = {
-  text: PropTypes.object.isRequired
+  text: PropTypes.object
 };
 
 export default TerminalWrapper;

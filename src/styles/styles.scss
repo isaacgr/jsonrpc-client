@@ -1,155 +1,30 @@
-// Spacing
-$s-size: 1.2rem;
-$m-size: 1.6rem;
-$l-size: 3.2rem;
-$xl-size: 4.8rem;
-$desktop-breakpoint: 45rem;
-
-// colors
-$primary: #ecf0f1;
-$light: #bdc3c7;
-$text: #34495e;
-$text-secondary: #7f8c8d;
-$success: #27ae60;
-
-* {
-  box-sizing: border-box;
-}
-
-html {
-  font-size: 62.5%;
-}
-
-body {
-  background: $primary;
-  font-family: "Sans serif", "Helvetica", "Arial", sans-serif;
-  font-size: $m-size;
-  box-sizing: border-box;
-}
-
-.container {
-  width: 90%;
-  margin: 0 auto;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-}
-
-.header {
-  color: $text;
-}
-
-.navbar {
-  display: flex;
-  &__link {
-    width: 50%;
-    text-decoration: none;
-    margin: 0 $m-size;
-    color: $text;
-    &:hover {
-      color: $text-secondary;
-      transition: 0.3s all;
-    }
-  }
-}
-
-.form {
-  margin-top: $m-size;
-  width: 100%;
-  text-align: center;
-  &__section {
-    margin-top: $s-size;
-    &.textarea {
-      margin-top: $m-size;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-    }
-  }
-  &__input {
-    margin-right: $s-size;
-  }
-  &__label {
-    margin-right: $s-size;
-    color: $text;
-  }
-  &__header {
-    font-size: $m-size;
-    letter-spacing: 0.5px;
-    color: $text-secondary;
-  }
-  &__submit,
-  &__button {
-    padding: $s-size $m-size;
-    border: 1px solid $text;
-    cursor: pointer;
-
-    &:focus {
-      color: $text-secondary;
-    }
-  }
-}
-
-.table-container {
-  display: flex;
-  flex-wrap: wrap;
-  margin-top: $m-size;
-  justify-content: center;
-}
-
-.table {
-  margin-top: $m-size;
-  &__data,
-  &__header {
-    border: 1px solid #ddd;
-    padding: $s-size;
-  }
-
-  &__row {
-    &:nth-child(even) {
-      background-color: $light;
-    }
-    &:hover {
-      background-color: #ddd;
-    }
-  }
-
-  &__header {
-    padding-top: 12px;
-    padding-bottom: 12px;
-    text-align: left;
-    background-color: $text-secondary;
-    color: white;
-  }
-  &.small-table {
-    width: 33%;
-  }
-}
-
-.diff {
-  background-color: lightsteelblue;
-}
-
-.error-message {
-  color: #e74c3c;
-  margin: 0 auto;
-  margin-top: 1rem;
-  text-align: center;
-}
-
-.connected {
-  background: $success;
+.button.MuiButton-root {
+  margin: 1rem;
 }
 
 .textarea {
   margin: 0 auto;
   margin-top: 5rem;
+  margin-bottom: 10rem;
+}
+
+.editor {
+  resize: both;
+  overflow: hidden;
+  height: 30vh;
+  width: 80%;
+  margin: 0 auto;
+}
+
+.textarea.editor {
+  height: 50vh;
 }
 
 .react-json-view {
   padding: 1rem;
-  width: 75rem;
+  width: 65%;
   height: 98vh;
   overflow: scroll;
+  margin: 0 auto;
+  font-size: 16px;
 }

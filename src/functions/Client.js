@@ -1,9 +1,12 @@
-const Jaysonic = require('jaysonic/lib/client-ws');
-const uuidv4 = require('uuid/v4');
+const Jaysonic = require("jaysonic/lib/client-ws");
+import { v4 as uuidv4 } from "uuid";
 
 class Client {
   constructor() {
-    this.ws = new Jaysonic.wsclient({ timeout: 600 });
+    this.ws = new Jaysonic.wsclient({
+      url: `ws://${window.location.host.split(":")[0]}:8100`,
+      timeout: 999999
+    });
     this.clientId = uuidv4();
   }
 
@@ -11,25 +14,43 @@ class Client {
     return this.ws.connect();
   }
 
+  disconnect() {
+    return this.ws.request().send("disconnect", [this.clientId]);
+  }
+
   connect(host, port, delimiter, timeout) {
-    return this.ws.request().send('connect', {
+    return this.ws.request().send("connect", {
       host,
       port,
-      delimiter: delimiter || '\r\n',
+      delimiter: delimiter || "\r\n",
       timeout,
       clientId: this.clientId
     });
   }
 
-  serverDisconnected(cb) {
-    this.ws.subscribe('tcp.disconnect', () => {
-      console.log('TCP server disconnected');
+  tcpServerDisconnected(cb) {
+    this.ws.subscribe("tcp.disconnect", ({ detail }) => {
+      if (detail.params[0] !== this.clientId) {
+        return;
+      }
+      console.log("TCP server disconnected");
       cb();
     });
   }
 
+  ping(eb) {
+    const _this = this;
+    setInterval(async () => {
+      try {
+        await _this.ws.request().send("ping", [_this.clientId]);
+      } catch (e) {
+        eb(e);
+      }
+    }, 5000);
+  }
+
   request(method, params) {
-    return this.ws.request().send('request', {
+    return this.ws.request().send("request", {
       method,
       params,
       clientId: this.clientId
@@ -37,7 +58,7 @@ class Client {
   }
 
   notify(method, params) {
-    return this.ws.request().send('notify', {
+    return this.ws.request().send("notify", {
       method,
       params,
       clientId: this.clientId
@@ -47,7 +68,7 @@ class Client {
   startSubscribe(method, cb) {
     return this.ws
       .request()
-      .send('start.subscribe', [method, this.clientId])
+      .send("start.subscribe", [method, this.clientId])
       .then(() => {
         this.ws.subscribe(method, cb);
       });
@@ -56,7 +77,7 @@ class Client {
   stopSubscribe(method) {
     return this.ws
       .request()
-      .send('stop.subscribe', [method, this.clientId])
+      .send("stop.subscribe", [method, this.clientId])
       .then(() => {
         this.ws.unsubscribeAll(method);
       });
