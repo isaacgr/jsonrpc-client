@@ -72,7 +72,7 @@ export default function SubscriptionsInput({ ...props }) {
             placeholder
           });
           return (
-            <div>
+            <div style={{ width: "25%" }}>
               <TextField
                 InputProps={{
                   startAdornment: selectedItem.map((item) => (

@@ -2,29 +2,20 @@
   margin: 1rem;
 }
 
-.textarea {
+.results-terminal {
   margin: 0 auto;
   margin-top: 5rem;
   margin-bottom: 10rem;
+  height: 80vh;
 }
 
-.editor {
+.params-editor {
   resize: both;
   overflow: hidden;
   height: 30vh;
   width: 80%;
   margin: 0 auto;
-}
-
-.textarea.editor {
-  height: 50vh;
-}
-
-.react-json-view {
-  padding: 1rem;
-  width: 65%;
-  height: 98vh;
-  overflow: scroll;
-  margin: 0 auto;
-  font-size: 16px;
+  > section {
+    margin: 0 auto;
+  }
 }

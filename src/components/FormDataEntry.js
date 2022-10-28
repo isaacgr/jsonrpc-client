@@ -1,7 +1,7 @@
 import React, { useRef } from "react";
 import TextField from "@mui/material/TextField";
 import Editor from "@monaco-editor/react";
-import { formatJson } from "../functions/json";
+import { formatJson } from "../utils/utils";
 
 const DataEntry = ({ method, params, setState }) => {
   const monacoRef = useRef(null);
@@ -41,7 +41,7 @@ const DataEntry = ({ method, params, setState }) => {
         />
       </div>
       <div className="content-block">
-        <div className="editor">
+        <div className="params-editor">
           <Editor
             onChange={(value, e) =>
               setState((prevState) => ({
@@ -50,7 +50,7 @@ const DataEntry = ({ method, params, setState }) => {
               }))
             }
             value={params || ""}
-            width="100%"
+            width="50%"
             height="100%"
             defaultLanguage="json"
             defaultValue=""

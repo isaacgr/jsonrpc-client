@@ -4,7 +4,10 @@ import PropTypes from "prop-types";
 
 const CurrentSubscriptions = ({ stopSubscribe, startSubscribe }) => {
   return (
-    <div className="content-block">
+    <div
+      style={{ margin: "2.5rem auto" }}
+      className="content-block content-block--flex"
+    >
       <SubscriptionsInput
         startSubscribe={startSubscribe}
         stopSubscribe={stopSubscribe}

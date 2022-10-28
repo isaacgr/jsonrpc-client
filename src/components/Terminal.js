@@ -1,8 +1,10 @@
 import React from "react";
 import PropTypes from "prop-types";
 import Editor from "@monaco-editor/react";
+import { saveTextAsFile } from "../utils/utils";
+import Button from "@mui/material/Button";
 
-const TerminalWrapper = ({ text }) => {
+const TerminalWrapper = ({ host, port, method, text }) => {
   let output = null;
   if (text) {
     try {
@@ -32,21 +34,34 @@ const TerminalWrapper = ({ text }) => {
   return !output ? (
     <div></div>
   ) : (
-    <div className="textarea editor">
-      <Editor
-        theme="vs-dark"
-        value={output}
-        width="100%"
-        height="100%"
-        defaultLanguage="json"
-        defaultValue=""
-        options={{
-          domReadOnly: true,
-          readOnly: true,
-          wordWrap: "wordWrapColumn"
-        }}
-      />
-    </div>
+    <>
+      <div className="content-block">
+        <Button
+          color="secondary"
+          variant="outlined"
+          onClick={() => {
+            saveTextAsFile(output, `${host}_${port}_${method}_results.json`);
+          }}
+        >
+          Save results to file
+        </Button>
+      </div>
+      <div className="results-terminal">
+        <Editor
+          theme="vs-dark"
+          value={output}
+          width="100%"
+          height="100%"
+          defaultLanguage="json"
+          defaultValue=""
+          options={{
+            domReadOnly: true,
+            readOnly: true,
+            wordWrap: "wordWrapColumn"
+          }}
+        />
+      </div>
+    </>
   );
 };
 

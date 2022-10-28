@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import Form from "./Form";
-import Client from "../functions/Client";
+import Client from "../Client";
 import Terminal from "./Terminal";
 import CurrentSubscriptions from "./CurrentSubscriptions";
 import Alert from "@mui/material/Alert";
@@ -58,6 +58,7 @@ const JsonRpcClient = () => {
     setState((prevState) => ({
       ...prevState,
       connected: false,
+      response: null,
       error: ""
     }));
     try {
@@ -301,7 +302,12 @@ const JsonRpcClient = () => {
           ""
         )}
       </div>
-      <Terminal text={state.response} />
+      <Terminal
+        host={state.host}
+        port={state.port}
+        method={state.method}
+        text={state.response}
+      />
     </div>
   );
 };
