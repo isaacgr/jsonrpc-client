@@ -10,12 +10,12 @@
 }
 
 .params-editor {
-  resize: both;
-  overflow: hidden;
   height: 30vh;
   width: 80%;
+  resize: both;
+  overflow: hidden;
+}
+
+section {
   margin: 0 auto;
-  > section {
-    margin: 0 auto;
-  }
 }

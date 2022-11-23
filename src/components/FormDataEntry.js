@@ -41,23 +41,22 @@ const DataEntry = ({ method, params, setState }) => {
         />
       </div>
       <div className="content-block">
-        <div className="params-editor">
-          <Editor
-            onChange={(value, e) =>
-              setState((prevState) => ({
-                ...prevState,
-                params: value || null
-              }))
-            }
-            value={params || ""}
-            width="50%"
-            height="100%"
-            defaultLanguage="json"
-            defaultValue=""
-            theme="vs-dark"
-            onMount={handleEditorDidMount}
-          />
-        </div>
+        <Editor
+          className="params-editor"
+          onChange={(value, e) =>
+            setState((prevState) => ({
+              ...prevState,
+              params: value || null
+            }))
+          }
+          value={params || ""}
+          width="50%"
+          height="100%"
+          defaultLanguage="json"
+          defaultValue=""
+          theme="vs-dark"
+          onMount={handleEditorDidMount}
+        />
       </div>
     </div>
   );
